@@ -187,7 +187,12 @@ table.cost{width:100%;border-collapse:collapse;font-size:13px;min-width:460px}
 .empty{font-size:13px;color:var(--muted);padding:6px 0}
 details.card summary{cursor:pointer;font-weight:700;font-size:15px}
 .receipt{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:center;background:var(--bg);border:1px dashed var(--line);border-radius:10px;padding:10px}
-.receipt img{width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid var(--line)}
+.receipt .thumb{padding:0;border:1px solid var(--line);border-radius:8px;background:none;cursor:zoom-in;width:56px;height:56px;overflow:hidden}
+.receipt .thumb img{width:100%;height:100%;object-fit:cover;display:block}
+dialog.pv{border:0;padding:0;background:transparent;max-width:min(96vw,720px);max-height:92vh;width:100%}
+dialog.pv::backdrop{background:rgba(0,0,0,.8)}
+dialog.pv img{display:block;max-width:100%;max-height:calc(92vh - 56px);margin:0 auto;border-radius:8px;object-fit:contain}
+dialog.pv .pvbar{display:flex;justify-content:center;padding-top:10px}
 .receipt .rtxt{display:grid;gap:2px;min-width:0;font-size:12px;color:var(--muted)}
 .ghostbtn{font:inherit;font-size:14px;font-weight:500;border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:8px;padding:8px 14px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;justify-self:start}
 .ghostbtn svg{width:16px;height:16px;color:var(--sun)}
@@ -297,13 +302,14 @@ details.card[open] summary{margin-bottom:6px}
       <form id="exForm" class="exform" novalidate>
         <div class="f wide">
           <div class="receipt">
-            <img id="exPhotoPrev" alt="" hidden>
+            <button type="button" class="thumb" id="exThumb" aria-label="영수증 사진 크게 보기" hidden><img id="exPhotoPrev" alt=""></button>
             <div class="rtxt">
               <button type="button" class="ghostbtn" id="exPhotoBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>영수증 사진으로 채우기</button>
               <span id="exPhotoMsg">사진을 찍거나 고르면 항목·금액·날짜를 자동으로 채워요. 추가 전에 한 번 확인해 주세요</span>
             </div>
           </div>
           <input type="file" id="exPhoto" accept="image/*" hidden>
+          <dialog class="pv" id="photoView" aria-label="영수증 사진"><img id="photoBig" alt="영수증 사진"><div class="pvbar"><button type="button" class="ghostbtn" id="photoClose">닫기</button></div></dialog>
         </div>
         <div class="f wide"><label for="exItem">항목</label><input class="inp" id="exItem" maxlength="100" placeholder="예: 빈원더스 입장권 4인" required></div>
         <div class="f"><label for="exAmt">금액</label>
@@ -731,7 +737,7 @@ function resetForm(){
   $('exSubmit').textContent='추가';$('exCancel').hidden=true;
   ['exItem','exAmt','exMemo'].forEach(i=>$(i).value='');
   $('exDate').value=new Date().toLocaleDateString('sv-SE');$('exPayer').value=me();
-  $('exPhotoPrev').hidden=true;$('exPhotoMsg').textContent='사진을 찍거나 고르면 항목·금액·날짜를 자동으로 채워요. 추가 전에 한 번 확인해 주세요';
+  $('exThumb').hidden=true;$('exPhotoMsg').textContent='사진을 찍거나 고르면 항목·금액·날짜를 자동으로 채워요. 추가 전에 한 번 확인해 주세요';
 }
 function startEdit(id){
   const x=store.expenses.find(v=>v.id===id);if(!x)return;
@@ -740,7 +746,7 @@ function startEdit(id){
   $('exItem').value=x.item;$('exAmt').value=Number(x.amount).toLocaleString('ko-KR');$('exCur').value=x.cur;
   $('exCat').value=x.cat;$('exDate').value=x.date;$('exPayer').value=x.payer||'';$('exMemo').value=x.memo||'';
   msg.textContent='고친 뒤 저장을 눌러 주세요';
-  $('exPhotoPrev').hidden=true;$('exPhotoMsg').textContent='영수증 사진을 다시 올리면 이 지출 내용을 사진 기준으로 바꿔요';
+  $('exThumb').hidden=true;$('exPhotoMsg').textContent='영수증 사진을 다시 올리면 이 지출 내용을 사진 기준으로 바꿔요';
   $('exCard').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});
 }
 $('exCancel').addEventListener('click',()=>{resetForm();msg.textContent='수정을 취소했어요';});
@@ -768,6 +774,10 @@ form.addEventListener('submit',async e=>{
 });
 
 /* receipt photo → fields */
+const pv=$('photoView');
+$('exThumb').addEventListener('click',()=>{try{pv.showModal();}catch(e){pv.setAttribute('open','');}});
+$('photoClose').addEventListener('click',()=>pv.close());
+pv.addEventListener('click',e=>{if(e.target===pv)pv.close();});
 const photoBtn=$('exPhotoBtn'),photoMsg=$('exPhotoMsg');
 photoBtn.addEventListener('click',()=>{
   if(!API_URL){photoMsg.textContent='사진 읽기는 공유 저장소에 연결된 사이트에서만 돼요';return;}
@@ -775,18 +785,19 @@ photoBtn.addEventListener('click',()=>{
 });
 function shrink(file){return new Promise((res,rej)=>{
   const url=URL.createObjectURL(file),img=new Image();
-  img.onload=()=>{const k=Math.min(1,1600/Math.max(img.width,img.height));
+  img.onload=()=>{const k=Math.min(1,1280/Math.max(img.width,img.height));
     const c=document.createElement('canvas');c.width=Math.round(img.width*k);c.height=Math.round(img.height*k);
     c.getContext('2d').drawImage(img,0,0,c.width,c.height);URL.revokeObjectURL(url);
-    res(c.toDataURL('image/jpeg',0.85));};
+    res(c.toDataURL('image/jpeg',0.75));};
   img.onerror=()=>{URL.revokeObjectURL(url);rej(new Error('사진을 열 수 없어요'));};
   img.src=url;});}
 $('exPhoto').addEventListener('change',async e=>{
   const file=e.target.files&&e.target.files[0];e.target.value='';if(!file)return;
-  photoBtn.disabled=true;photoMsg.textContent='사진을 읽는 중이에요 (10초쯤 걸려요)';
+  photoBtn.disabled=true;const t0=Date.now();photoMsg.textContent='사진을 읽는 중이에요';
+  const tick=setInterval(()=>{photoMsg.textContent=`사진을 읽는 중이에요 · ${Math.round((Date.now()-t0)/1000)}초`;},1000);
   try{
     const dataUrl=await shrink(file);
-    $('exPhotoPrev').src=dataUrl;$('exPhotoPrev').hidden=false;
+    $('exPhotoPrev').src=dataUrl;$('photoBig').src=dataUrl;$('exThumb').hidden=false;
     const r=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},
       body:JSON.stringify({action:'readReceipt',image:dataUrl.split(',')[1],mime:'image/jpeg'})});
     const d=await r.json();if(!d.ok)throw new Error(d.error);
@@ -797,9 +808,9 @@ $('exPhoto').addEventListener('change',async e=>{
     if(f.date)$('exDate').value=f.date;
     if(f.memo&&!$('exMemo').value)$('exMemo').value=f.memo;
     if(!$('exPayer').value)$('exPayer').value=me();
-    photoMsg.textContent=`읽었어요: ${f.item||'항목 없음'} · ${Number(f.amount).toLocaleString('ko-KR')} ${f.cur}. 맞는지 확인하고 ${editingId?'저장을':'추가를'} 눌러 주세요`;
+    photoMsg.textContent=`${((Date.now()-t0)/1000).toFixed(1)}초 만에 읽었어요: ${f.item||'항목 없음'} · ${Number(f.amount).toLocaleString('ko-KR')} ${f.cur}. 맞는지 확인하고 ${editingId?'저장을':'추가를'} 눌러 주세요`;
   }catch(err){photoMsg.textContent='사진을 읽지 못했어요 · '+(err.message||'다시 시도해 주세요');}
-  finally{photoBtn.disabled=false;}
+  finally{clearInterval(tick);photoBtn.disabled=false;}
 });
 
 function renderAll(){renderTodo();renderExpenses();}
