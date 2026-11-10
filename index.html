@@ -32,7 +32,7 @@
 body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.6}
 .wrap{max-width:760px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:24px 56px;display:grid;gap:28px}
 h1,h2,h3{text-wrap:balance;margin:0}
-h1{font-family:var(--display);font-weight:400;font-size:clamp(30px,8vw,44px);line-height:1.15;letter-spacing:.01em}
+h1{font-family:var(--display);font-weight:400;font-size:clamp(24px,6.5vw,34px);line-height:1.2;letter-spacing:.01em}
 .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--sea)}
 .lede{color:var(--muted);margin:6px 0 0}
 a{color:var(--sea)}
@@ -54,7 +54,10 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--sun);outline-offset
 .overview{display:grid;gap:12px}
 .overview h2{font-family:var(--display);font-weight:400;font-size:24px}
 .mapcard{background:var(--paper);border:1px solid var(--line);border-radius:14px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);overflow:hidden}
-.mapsvg{background:var(--water);display:flex;justify-content:center;min-width:0}
+.mapsvg{background:var(--water);display:flex;justify-content:center;min-width:0;position:relative}
+.mapsvg svg{cursor:pointer}
+.mapopen{position:absolute;right:8px;bottom:8px;display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;text-decoration:none;color:var(--paper);background:var(--sea);border-radius:999px;padding:6px 12px;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+.mapopen:focus-visible{outline:2px solid var(--sun);outline-offset:2px}
 .mapsvg svg{width:100%;max-width:340px;height:auto;display:block}
 .legend{padding:14px 16px;display:grid;gap:10px;align-content:start;min-width:0}
 .filters{display:flex;flex-wrap:wrap;gap:6px}
@@ -74,10 +77,9 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--sun);outline-offset
 .svg-route.dim{opacity:.12}
 @media (prefers-reduced-motion:reduce){.svg-route{transition:none}}
 
-.daynav{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:8px;display:flex;gap:8px;overflow-x:auto}
+
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
-.daynav a{flex:none;text-decoration:none;color:var(--ink);border:1px solid var(--line);background:var(--paper);border-radius:999px;padding:6px 14px;font-size:13px;font-weight:500}
-.daynav a b{color:var(--c)}
+
 
 .day{display:grid;gap:14px;scroll-margin-top:64px}
 .dayhead{display:grid;gap:4px;border-top:4px solid var(--c);padding-top:12px}
@@ -110,6 +112,23 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .note h3{font-size:15px}
 .note ul{margin:0;padding-left:18px}
 footer{font-size:12px;color:var(--muted)}
+.wrap{gap:16px}
+.top{display:grid;gap:2px}
+.top .lede{margin:2px 0 0;font-size:13px}
+.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:6;background:var(--bg);display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;padding-block:8px;border-bottom:1px solid var(--line);margin-inline:calc(-1*max(16px,env(safe-area-inset-left,0px))) calc(-1*max(16px,env(safe-area-inset-right,0px)));padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.tabs button{font:inherit;font-size:14px;font-weight:500;border:0;border-radius:10px;padding:9px 4px;background:transparent;color:var(--muted);cursor:pointer;position:relative;white-space:nowrap}
+.tabs button[aria-selected="true"]{background:var(--ink);color:var(--bg);font-weight:700}
+.tabs .badge{display:inline-block;margin-left:3px;font-family:var(--mono);font-size:10px;font-weight:500;opacity:.8}
+.tabs .badge:empty{display:none}
+.panel-wrap{display:grid;gap:16px;min-width:0}
+.ph{font-family:var(--display);font-weight:400;font-size:22px}
+.daytabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.daytabs button{font:inherit;border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:10px;padding:7px 4px;cursor:pointer;display:grid;gap:0;text-align:center;border-top:3px solid var(--c)}
+.daytabs b{font-size:14px} .daytabs span{font-size:11px;color:var(--muted);font-family:var(--mono)}
+.daytabs button[aria-selected="true"]{background:var(--c);border-color:var(--c);color:var(--paper)}
+.daytabs button[aria-selected="true"] span{color:var(--paper);opacity:.85}
+.daytabs .today{position:relative}
+.daytabs .today::after{content:"오늘";position:absolute;top:-8px;right:4px;font-size:10px;background:var(--sun);color:var(--paper);border-radius:999px;padding:0 6px}
 .block{display:grid;gap:12px;scroll-margin-top:64px}
 .block>div>h2{font-family:var(--display);font-weight:400;font-size:24px}
 .bk{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
@@ -199,6 +218,40 @@ dialog.pv .pvbar{display:flex;justify-content:center;padding-top:10px}
 .ghostbtn:disabled{opacity:.5;cursor:default}
 .card.editing{border-color:var(--sea);box-shadow:0 0 0 2px var(--chip)}
 .rowbtns{display:flex;gap:4px;justify-content:flex-end;margin-top:2px}
+.tasks{display:grid;gap:12px}
+.tl2{list-style:none;margin:0;padding:0;display:grid}
+.tl2 li{display:grid;grid-template-columns:22px 1fr;gap:8px;align-items:start;padding:7px 0;border-bottom:1px dashed var(--line)}
+.tl2 li:last-child{border-bottom:0}
+.tl2 .tchk{width:18px;height:18px;margin:3px 0 0;accent-color:var(--sea);cursor:pointer}
+.tl2 .tx{font-size:14px;min-width:0;overflow-wrap:anywhere;cursor:text;border-radius:6px;padding:1px 4px;margin:-1px -4px}
+.tl2 .tx:hover{background:var(--chip)}
+.tl2 .tx:focus-visible{outline:2px solid var(--sea)}
+.tl2 small{display:block;color:var(--muted);font-size:12px;line-height:1.45}
+.tl2 .by{display:block;font-size:11px;color:var(--sea);margin-top:1px}
+#doneList .tx{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--line)}
+#doneList .tx small,#doneList .by{text-decoration:none}
+.tl2 li.moved{animation:moved 1.2s ease-out}
+@keyframes moved{from{background:var(--chip)}to{background:transparent}}
+@media (prefers-reduced-motion:reduce){.tl2 li.moved{animation:none}}
+.taskform{display:grid;gap:6px;grid-column:1/-1}
+.tl2 li .taskform{grid-column:2}
+.tfbtns{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.tfbtns .go{padding:7px 14px}
+.tfbtns .ghostbtn{padding:6px 12px}
+.addtask{font:inherit;font-size:14px;font-weight:500;color:var(--sea);background:transparent;border:1px dashed var(--line);border-radius:8px;padding:8px;cursor:pointer;width:100%}
+.addtask:hover{border-color:var(--sea)}
+.secthead{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.secthead h3{font-size:16px}
+.bklist{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.bkitem{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:grid;gap:6px;min-width:0}
+.bkitem .bh{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.bkitem .bh b{font-size:15px;overflow-wrap:anywhere}
+.bkitem .when{font-family:var(--mono);font-size:12px;color:var(--sea)}
+.bkitem .kv{font-size:13px}
+.bkitem .kv a{color:var(--sea)}
+.bkitem .rowbtns{justify-content:flex-start;margin:0}
+.exform .chk{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink)}
+.exform .chk input{width:18px;height:18px;accent-color:var(--sea)}
 .edit{font:inherit;font-size:11px;border:1px solid var(--line);background:transparent;color:var(--sea);border-radius:6px;padding:1px 7px;cursor:pointer}
 details.card[open] summary{margin-bottom:6px}
 </style>
@@ -206,91 +259,184 @@ details.card[open] summary{margin-bottom:6px}
 </head>
 <body>
 <div class="wrap">
-  <header style="display:grid;gap:14px">
-    <div>
-      <div class="eyebrow">Phu Quoc · Family Trip</div>
-      <h1>푸꾸옥 가족여행<br>3박 4일</h1>
-      <p class="lede">11월 27일(금) ~ 12월 1일(화) 새벽 귀국 · 제주항공 직항 · 숙소 빈펄 리조트 앤 스파 푸꾸옥</p>
-    </div>
-    <div class="pass" aria-label="항공편">
-      <div class="leg">
-        <span class="lab">출국 · 11/27 금 · 7C2315</span>
-        <span class="route">ICN <i>✈</i> PQC</span>
-        <span class="t">18:00 → 22:15</span>
-        <span class="d">인천 1터미널 출발 · 제주항공</span>
-      </div>
-      <div class="leg">
-        <span class="lab">귀국 · 11/30 월 · 7C2316</span>
-        <span class="route">PQC <i>✈</i> ICN</span>
-        <span class="t">23:15 → 06:35 (12/1 화)</span>
-        <span class="d">인천 1터미널 도착 · 제주항공</span>
-      </div>
-    </div>
-    <div class="facts">
-      <span class="chip">성인 2 · 초등 아들(11세) · 딸(4세)</span>
-      <span class="chip">1~3일차: Grab · 리조트 셔틀</span>
-      <span class="chip">항공·호텔 결제 완료</span>
-      <span class="chip">4일차: 기사 포함 단독 차량 6~8시간</span>
-    </div>
+  <header class="top">
+    <div class="eyebrow">Phu Quoc · Family Trip</div>
+    <h1>푸꾸옥 가족여행 3박 4일</h1>
+    <p class="lede">11/27(금) ~ 12/1(화) 새벽 귀국 · 제주항공 직항 · 빈펄 리조트 앤 스파</p>
   </header>
 
-  <section class="block" id="booking">
-    <div><div class="eyebrow">Bookings</div><h2>예약 정보</h2></div>
-    <div class="bk">
-      <div class="card">
-        <h3>항공 · 제주항공 <span class="paid">결제 완료</span></h3>
-        <dl class="kv">
-          <dt>가는 편</dt><dd class="mono">7C2315 · 11/27(금) 18:00 인천 T1 → 22:15 푸꾸옥</dd>
-          <dt>오는 편</dt><dd class="mono">7C2316 · 11/30(월) 23:15 푸꾸옥 → 12/1(화) 06:35 인천 T1</dd>
-          <dt>운임</dt><dd>스탠다드 · 성인 2, 아동 2</dd>
-          <dt>결제</dt><dd class="mono">1,240,400원</dd>
-        </dl>
-      </div>
-      <div class="card">
-        <h3>호텔 · 빈펄 리조트 앤 스파 푸꾸옥 <span class="paid">결제 완료</span></h3>
-        <dl class="kv">
-          <dt>예약번호</dt><dd class="mono">HH2637488834</dd>
-          <dt>숙박</dt><dd>11/27 ~ 11/30 (3박) · 체크인 15:00, 체크아웃 12:00</dd>
-          <dt>객실</dt><dd>디럭스 가든뷰 트윈 · 조식 포함 · 성인 2, 아동 2</dd>
-          <dt>요청</dt><dd>금연실 · 고층 · 늦은 체크인(00:00)</dd>
-          <dt>주소</dt><dd>Bai Dai, Ganh Dau, Phu Quoc</dd>
-          <dt>호텔</dt><dd class="mono">+84-297-3550550</dd>
-          <dt>예약처</dt><dd>하나투어(호텔스컴바인) <span class="mono">1577-1233</span></dd>
-          <dt>결제</dt><dd class="mono">874,229원</dd>
-        </dl>
-      </div>
+  <nav class="tabs" role="tablist" aria-label="메뉴">
+    <button type="button" role="tab" id="tab-schedule" data-tab="schedule" aria-controls="p-schedule">일정</button>
+    <button type="button" role="tab" id="tab-map" data-tab="map" aria-controls="p-map">지도</button>
+    <button type="button" role="tab" id="tab-check" data-tab="check" aria-controls="p-check">체크<span class="badge" id="tabCheckBadge"></span></button>
+    <button type="button" role="tab" id="tab-cost" data-tab="cost" aria-controls="p-cost">비용</button>
+    <button type="button" role="tab" id="tab-booking" data-tab="booking" aria-controls="p-booking">예약</button>
+  </nav>
+
+  <div class="panel-wrap" id="p-schedule" role="tabpanel" aria-labelledby="tab-schedule">
+    <div class="daytabs" role="tablist" aria-label="일자 선택">
+      <button type="button" role="tab" id="dt-day1" data-day="day1" style="--c:var(--d1)"><b>1일차</b><span>11/27 금</span></button>
+      <button type="button" role="tab" id="dt-day2" data-day="day2" style="--c:var(--d2)"><b>2일차</b><span>11/28 토</span></button>
+      <button type="button" role="tab" id="dt-day3" data-day="day3" style="--c:var(--d3)"><b>3일차</b><span>11/29 일</span></button>
+      <button type="button" role="tab" id="dt-day4" data-day="day4" style="--c:var(--d4)"><b>4일차</b><span>11/30 월</span></button>
     </div>
+
+  <section class="day" role="tabpanel" id="day1" style="--c:var(--d1)">
+    <div class="dayhead">
+      <span class="no">DAY 1 · 11/27</span>
+      <h2>푸꾸옥 입국과 휴식</h2>
+      <span class="meta">밤늦게 도착해요. 공항에서 북부 숙소까지 차로 약 40분</span>
+      <a class="btn primary routebtn" data-route="day1" target="_blank" rel="noopener">공항 → 숙소 경로 보기</a>
+    </div>
+    <ol class="tl" data-stops='[
+      ["15:30","인천공항 1터미널 도착","제주항공 카운터에서 수속","출발 2시간 30분 전 도착 권장","Incheon International Airport Terminal 1"],
+      ["18:00","인천 출발 · 7C2315","제주항공 직항",null,null],
+      ["22:15","푸꾸옥 국제공항 도착","입국 심사, 짐 찾기",null,"Phu Quoc International Airport"],
+      ["23:00","빈펄 리조트로 이동","호텔 픽업 버스 · 약 40분","픽업 신청함 · 확정 답장 대기",null],
+      ["23:45","빈펄 리조트 앤 스파 체크인","늦은 체크인 요청해 둠 · 아이들 바로 재우기",null,"Vinpearl Resort & Spa Phu Quoc"]
+    ]'></ol>
   </section>
 
-  <section class="block" id="check">
-    <div><div class="eyebrow">Checklist</div><h2>여행 체크리스트</h2></div>
+  <section class="day" role="tabpanel" id="day2" style="--c:var(--d2)">
+    <div class="dayhead">
+      <span class="no">DAY 2 · 11/28</span>
+      <h2>북부 테마파크 정복</h2>
+      <span class="meta">교통: 리조트 무료 셔틀 또는 Grab · 모두 숙소 근처 빈펄 단지에 모여 있어요</span>
+      <a class="btn primary routebtn" data-route="day2" target="_blank" rel="noopener">하루 동선 지도로 보기</a>
+    </div>
+    <ol class="tl" data-stops='[
+      ["09:00","빈펄 사파리 푸꾸옥","오픈형 야생 동물원, 사파리 버스 탑승","아들 만족도 최상 · 딸은 트램과 기린 먹이주기","Vinpearl Safari Phu Quoc"],
+      ["12:00","점심 · 웨일마운틴","한국인 입맛에 맞는 해산물·구이, 아이들용 볶음밥",null,"Whale Mountain restaurant Phu Quoc"],
+      ["13:30","빈원더스 푸꾸옥","대형 실내 아쿠아리움, 키즈 워터파크, 놀이기구",null,"VinWonders Phu Quoc"],
+      ["18:30","그랜드월드 푸꾸옥 · 저녁","유럽풍 운하 야경 감상 후 셔틀·Grab으로 숙소 복귀","20:15 대형 분수쇼","Grand World Phu Quoc"]
+    ]'></ol>
+  </section>
+
+  <section class="day" role="tabpanel" id="day3" style="--c:var(--d3)">
+    <div class="dayhead">
+      <span class="no">DAY 3 · 11/29</span>
+      <h2>리조트 호캉스와 즈엉동 시내</h2>
+      <span class="meta">교통: Grab · 남부 이동 없이 숙소와 즈엉동 시내만 오가요. 썬셋타운은 4일차 A코스에서 방문해요.</span>
+      <a class="btn primary routebtn" data-route="day3" target="_blank" rel="noopener">하루 동선 지도로 보기</a>
+    </div>
+    <ol class="tl" data-stops='[
+      ["09:00","리조트 호캉스 · 물놀이","대형 야외 수영장과 전용 해변에서 모래놀이, 리조트 조식","아이들 체력 보존","Vinpearl Resort & Spa Phu Quoc"],
+      ["14:30","킹콩마트 쇼핑","현지 과자, 망고, 기념품 편하게 장보기",null,"King Kong Mart Phu Quoc"],
+      ["15:30","촌촌 카페","시내가 한눈에 내려다보이는 언덕 위 카페에서 시원한 음료와 휴식",null,"Chuon Chuon Bistro Sky Bar Phu Quoc"],
+      ["17:30","저녁 · 메오키친","깔끔한 베트남 가정식, 위생 우수","어린이용 쌀국수 · 반쎄오","MEO Kitchen Phu Quoc"],
+      ["18:30","즈엉동 야시장 산책","철판 아이스크림, 땅콩 시식 등 길거리 구경","동선이 짧아 유모차 이동 쉬움","Phu Quoc Night Market Duong Dong"],
+      ["20:00","숙소 복귀 · 휴식","4일차 체크아웃과 귀국을 위해 일찍 취침",null,null]
+    ]'></ol>
+  </section>
+
+  <section class="day" role="tabpanel" id="day4" style="--c:var(--d4)">
+    <div class="dayhead">
+      <span class="no">DAY 4 · 11/30</span>
+      <h2>체크아웃 투어</h2>
+      <span class="meta">교통: 기사 포함 단독 차량 약 9시간(12:00~21:00) · 캐리어를 실어 두고 아이들은 차에서 쉴 수 있어요</span>
+    </div>
+    <ol class="tl" data-stops='[["12:00","빈펄 리조트 체크아웃","전용 차량에 짐 싣고 출발",null,"Vinpearl Resort & Spa Phu Quoc"]]'></ol>
+
+    <div class="opts" role="tablist" aria-label="4일차 코스 선택">
+      <button id="tabA" role="tab" aria-selected="true" aria-controls="optA">A · 남부 액티비티</button>
+      <button id="tabB" role="tab" aria-selected="false" aria-controls="optB">B · 시내 힐링</button>
+    </div>
+
+    <div id="optA" class="panel" role="tabpanel" aria-labelledby="tabA">
+      <p class="optdesc">아들과 딸 모두 즐길 볼거리 중심 코스</p>
+      <a class="btn primary routebtn" data-route="day4a" target="_blank" rel="noopener">A코스 동선 지도로 보기</a>
+      <ol class="tl" data-stops='[
+        ["12:30","남부 해안가 레스토랑 점심","",null,"seafood restaurant An Thoi Phu Quoc"],
+        ["14:00","혼똔섬 해상 케이블카 · 테마파크","바다 위를 건너는 세계 최장 케이블카, 섬 안 산책",null,"Hon Thom Cable Car Phu Quoc"],
+        ["16:30","썬셋타운 · 키스브릿지","지중해풍 거리 산책, 가족 사진, 노을 감상",null,"Kiss Bridge Phu Quoc"],
+        ["18:30","가족 스파 · 샤워 · 저녁","공항 근처 샤워 가능한 스파에서 피로 풀고 가볍게 저녁",null,"spa near Phu Quoc International Airport"]
+      ]'></ol>
+    </div>
+
+    <div id="optB" class="panel" role="tabpanel" aria-labelledby="tabB" hidden>
+      <p class="optdesc">4세 딸 체력을 배려한 편안한 코스</p>
+      <a class="btn primary routebtn" data-route="day4b" target="_blank" rel="noopener">B코스 동선 지도로 보기</a>
+      <ol class="tl" data-stops='[
+        ["12:30","시내 맛집 점심","",null,"restaurants Duong Dong Phu Quoc"],
+        ["13:30","온천 스파 또는 키즈카페","날씨 따라 머드·온천 스파 또는 실내 키즈카페",null,"mud bath spa Phu Quoc"],
+        ["15:00","뷰 카페 · 촌촌 / 느옥찌엔","언덕 위에서 시내가 내려다보이는 카페",null,"Chuon Chuon Bistro Sky Bar Phu Quoc"],
+        ["16:30","즈엉동 야시장 · 킹콩마트","망고, 기념품 마지막 장보기",null,"Phu Quoc Night Market Duong Dong"],
+        ["18:30","가족 스파 · 샤워 · 저녁","공항 근처 샤워 가능한 스파, 가볍게 저녁",null,"spa near Phu Quoc International Airport"]
+      ]'></ol>
+    </div>
+
+    <div class="dayhead" style="--c:var(--sea);margin-top:6px">
+      <span class="no">공통 · 공항 이동</span>
+    </div>
+    <ol class="tl" data-stops='[
+      ["20:30","공항으로 이동","단독 차량 샌딩",null,"Phu Quoc International Airport"],
+      ["21:00","공항 도착 · 탑승 수속","출발 2시간 전",null,null],
+      ["23:15","푸꾸옥 출발 · 7C2316","12/1(화) 06:35 인천 1터미널 도착",null,null]
+    ]'></ol>
+  </section>
+
+  <div class="note">
+    <h3>링크 사용법</h3>
+    <ul>
+      <li><b>지도</b>: 구글지도 앱에서 장소를 열어요. 사진·리뷰·영업시간도 거기서 볼 수 있어요.</li>
+      <li><b>사진</b>: 구글 이미지 검색으로 장소 사진을 보여줘요.</li>
+      <li>웨일마운틴, 느옥찌엔처럼 한국어 별칭으로 알려진 곳은 검색 결과가 맞는지 한 번 확인해 주세요.</li>
+    </ul>
+  </div>
+  </div>
+
+  <div class="panel-wrap" id="p-map" role="tabpanel" aria-labelledby="tab-map" hidden>
+  <section class="overview">
+<h2 class="ph">전체 동선 지도</h2>
+    <div class="mapcard">
+      <div class="mapsvg"><svg id="island" viewBox="0 0 320 540" role="img" aria-label="푸꾸옥 섬 동선 개략도"></svg><a class="mapopen" id="mapLink" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&amp;query=Phu+Quoc">구글지도로 보기 ↗</a></div>
+      <div class="legend">
+        <div class="filters" id="filters" aria-label="일자별 동선 보기"></div>
+        <ol class="pl" id="plist"></ol>
+        <p class="mapnote">장소 위치는 실제 좌표 기준이고, 선은 이동 순서를 이은 직선이에요. 실제 도로 경로는 아래 버튼으로 구글지도에서 보세요.</p>
+      </div>
+    </div>
+    <div class="dist">
+      <span>숙소 ↔ 공항 약 40분</span>
+      <span>숙소 ↔ 즈엉동 시내 약 35분</span>
+      <span>숙소 ↔ 남부 썬셋타운 약 1시간 10분</span>
+    </div>
+  </section>
+  </div>
+
+  <div class="panel-wrap" id="p-check" role="tabpanel" aria-labelledby="tab-check" hidden>
+  <section class="block">
+    <h2 class="ph">여행 체크리스트</h2>
     <div class="who">
       <label for="meName">내 이름</label>
       <input class="inp" id="meName" maxlength="20" placeholder="예: 아빠" autocomplete="nickname">
-      <span class="formmsg">체크와 지출 기록에 이 이름이 남아요</span>
+      <span class="formmsg">체크·지출·예약 기록에 이 이름이 남아요</span>
       <span class="sync" id="sync">불러오는 중</span>
     </div>
-    <div class="cl">
-      <div class="card done">
-        <h3>한 일 <span class="cnt">5개</span></h3>
-        <ul>
-          <li><span class="ok">✓</span><span>항공권 결제<small>제주항공 7C2315 / 7C2316, 4인</small></span></li>
-          <li><span class="ok">✓</span><span>호텔 결제<small>빈펄 리조트 앤 스파 3박, 조식 포함</small></span></li>
-          <li><span class="ok">✓</span><span>호텔 늦은 체크인·금연·고층 요청<small>밤 11시 넘어 도착하는 일정에 맞춰 요청됨</small></span></li>
-          <li><span class="ok">✓</span><span>일정·동선 확정<small>4일차 A/B 코스만 남음</small></span></li>
-          <li><span class="ok">✓</span><span>도착일 호텔 픽업 버스 신청 메일 발송<small>11/5 보냄 · 답장 기다리는 중</small></span></li>
-        </ul>
-      </div>
+    <div class="tasks">
       <div class="card">
         <h3>할 일 <span class="cnt" id="todoCnt"></span></h3>
         <div class="prog" aria-hidden="true"><i id="todoBar"></i></div>
-        <ul id="todo"></ul>
+        <ul class="tl2" id="todoList"></ul>
+        <button type="button" class="addtask" id="addTaskBtn">+ 할 일 추가</button>
+        <form id="addTaskForm" class="taskform" hidden novalidate>
+          <input class="inp" id="newTitle" maxlength="100" placeholder="할 일 (예: 유심 사기)" aria-label="새 할 일">
+          <input class="inp" id="newNote" maxlength="200" placeholder="메모 (선택)" aria-label="메모">
+          <div class="tfbtns"><button class="go" type="submit">추가</button><button class="ghostbtn" type="button" id="addTaskCancel">닫기</button><span class="formmsg" id="addTaskMsg"></span></div>
+        </form>
       </div>
+      <div class="card">
+        <h3>한 일 <span class="cnt" id="doneCnt"></span></h3>
+        <ul class="tl2" id="doneList"></ul>
+      </div>
+      <p class="formmsg">내용을 누르면 고칠 수 있어요. 체크하면 한 일로, 체크를 풀면 다시 할 일로 옮겨져요.</p>
     </div>
   </section>
+  </div>
 
-  <section class="block" id="cost">
-    <div><div class="eyebrow">Budget</div><h2>비용 정산</h2></div>
+  <div class="panel-wrap" id="p-cost" role="tabpanel" aria-labelledby="tab-cost" hidden>
+  <section class="block">
+    <h2 class="ph">비용 정산</h2>
     <div class="sums">
       <div class="sum"><span>지금까지 쓴 돈</span><b id="sumSpent">-</b></div>
       <div class="sum"><span>예상 총비용</span><b>약 321~355만원</b></div>
@@ -360,140 +506,91 @@ details.card[open] summary{margin-bottom:6px}
       <p class="mapnote">1,000동 ≈ 54원 기준. 입장권은 키 기준(1m 미만 무료, 1~1.4m 아동가)이라 아이들 키에 따라 달라져요. 쇼핑·기념품은 빠져 있어요.</p>
     </details>
   </section>
+  </div>
 
-  <section class="overview" id="map">
-    <div>
-      <div class="eyebrow">Route Map</div>
-      <h2>전체 동선 지도</h2>
+  <div class="panel-wrap" id="p-booking" role="tabpanel" aria-labelledby="tab-booking" hidden>
+  <section class="block">
+    <h2 class="ph">예약 정보</h2>
+    <div class="secthead"><h3>추가한 예약 <span class="cnt" id="bkCnt"></span></h3><button type="button" class="ghostbtn" id="bkAddBtn">+ 예약 추가</button></div>
+    <span class="formmsg" id="bkNote"></span>
+    <div class="card" id="bkCard" hidden>
+      <h3 id="bkHead">예약 추가</h3>
+      <form id="bkForm" class="exform" novalidate>
+        <div class="f wide">
+          <div class="receipt">
+            <button type="button" class="thumb" id="bkThumb" aria-label="예약 사진 크게 보기" hidden><img id="bkPhotoPrev" alt=""></button>
+            <div class="rtxt">
+              <button type="button" class="ghostbtn" id="bkPhotoBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>예약 화면 사진으로 채우기</button>
+              <span id="bkPhotoMsg">예약 확인 화면이나 바우처를 캡처해서 올리면 내용을 자동으로 채워요</span>
+            </div>
+          </div>
+          <input type="file" id="bkPhoto" accept="image/*" hidden>
+        </div>
+        <div class="f"><label for="bkType">종류</label><select class="inp" id="bkType">
+          <option>입장권·투어</option><option>교통</option><option>식당</option><option>스파</option><option>숙소</option><option>항공</option><option>기타</option></select></div>
+        <div class="f"><label for="bkNo">예약번호</label><input class="inp" id="bkNo" maxlength="60" placeholder="선택"></div>
+        <div class="f wide"><label for="bkName">이름</label><input class="inp" id="bkName" maxlength="100" placeholder="예: 빈원더스 입장권 4인"></div>
+        <div class="f"><label for="bkDate">이용 날짜</label><input class="inp" type="date" id="bkDate" min="2026-10-01" max="2026-12-31"></div>
+        <div class="f"><label for="bkTime">시간</label><input class="inp" type="time" id="bkTime"></div>
+        <div class="f wide"><label for="bkPlace">장소</label><input class="inp" id="bkPlace" maxlength="150" placeholder="장소 이름이나 주소"></div>
+        <div class="f"><label for="bkAmt">금액</label>
+          <div class="amt"><input class="inp" id="bkAmt" inputmode="decimal" placeholder="0">
+          <select class="inp" id="bkCur" aria-label="통화"><option>KRW</option><option>VND</option><option>USD</option></select></div></div>
+        <div class="f wide"><label for="bkMemo">메모</label><input class="inp" id="bkMemo" maxlength="300" placeholder="인원, 포함 사항, 취소 조건 등"></div>
+        <label class="chk f wide" id="bkExpWrap"><input type="checkbox" id="bkToExp" checked> 금액이 있으면 비용 탭 지출에도 기록</label>
+        <div class="act"><button class="go" id="bkSubmit" type="submit">추가</button><button class="ghostbtn" id="bkCancel" type="button">닫기</button><span class="formmsg" id="bkMsg"></span></div>
+      </form>
     </div>
-    <div class="mapcard">
-      <div class="mapsvg"><svg id="island" viewBox="0 0 320 540" role="img" aria-label="푸꾸옥 섬 동선 개략도"></svg></div>
-      <div class="legend">
-        <div class="filters" id="filters" aria-label="일자별 동선 보기"></div>
-        <ol class="pl" id="plist"></ol>
-        <p class="mapnote">장소 위치는 실제 좌표 기준이고, 선은 이동 순서를 이은 직선이에요. 실제 도로 경로는 아래 버튼으로 구글지도에서 보세요.</p>
+    <ul class="bklist" id="bkList"></ul>
+    <h3 class="sub" style="font-size:16px;margin-top:6px">항공 · 호텔</h3>
+  <div class="pass" aria-label="항공편">
+      <div class="leg">
+        <span class="lab">출국 · 11/27 금 · 7C2315</span>
+        <span class="route">ICN <i>✈</i> PQC</span>
+        <span class="t">18:00 → 22:15</span>
+        <span class="d">인천 1터미널 출발 · 제주항공</span>
+      </div>
+      <div class="leg">
+        <span class="lab">귀국 · 11/30 월 · 7C2316</span>
+        <span class="route">PQC <i>✈</i> ICN</span>
+        <span class="t">23:15 → 06:35 (12/1 화)</span>
+        <span class="d">인천 1터미널 도착 · 제주항공</span>
       </div>
     </div>
-    <div class="dist">
-      <span>숙소 ↔ 공항 약 40분</span>
-      <span>숙소 ↔ 즈엉동 시내 약 35분</span>
-      <span>숙소 ↔ 남부 썬셋타운 약 1시간 10분</span>
+    <div class="facts">
+      <span class="chip">성인 2 · 초등 아들(11세) · 딸(4세)</span>
+      <span class="chip">1~3일차: Grab · 리조트 셔틀</span>
+      <span class="chip">항공·호텔 결제 완료</span>
+      <span class="chip">4일차: 기사 포함 단독 차량 약 9시간</span>
     </div>
+    <div class="bk">
+      <div class="card">
+        <h3>항공 · 제주항공 <span class="paid">결제 완료</span></h3>
+        <dl class="kv">
+          <dt>가는 편</dt><dd class="mono">7C2315 · 11/27(금) 18:00 인천 T1 → 22:15 푸꾸옥</dd>
+          <dt>오는 편</dt><dd class="mono">7C2316 · 11/30(월) 23:15 푸꾸옥 → 12/1(화) 06:35 인천 T1</dd>
+          <dt>운임</dt><dd>스탠다드 · 성인 2, 아동 2</dd>
+          <dt>결제</dt><dd class="mono">1,240,400원</dd>
+        </dl>
+      </div>
+      <div class="card">
+        <h3>호텔 · 빈펄 리조트 앤 스파 푸꾸옥 <span class="paid">결제 완료</span></h3>
+        <dl class="kv">
+          <dt>예약번호</dt><dd class="mono">HH2637488834</dd>
+          <dt>숙박</dt><dd>11/27 ~ 11/30 (3박) · 체크인 15:00, 체크아웃 12:00</dd>
+          <dt>객실</dt><dd>디럭스 가든뷰 트윈 · 조식 포함 · 성인 2, 아동 2</dd>
+          <dt>요청</dt><dd>금연실 · 고층 · 늦은 체크인(00:00)</dd>
+          <dt>주소</dt><dd>Bai Dai, Ganh Dau, Phu Quoc</dd>
+          <dt>호텔</dt><dd class="mono">+84-297-3550550</dd>
+          <dt>예약처</dt><dd>하나투어(호텔스컴바인) <span class="mono">1577-1233</span></dd>
+          <dt>결제</dt><dd class="mono">874,229원</dd>
+        </dl>
+      </div>
+    </div>
+
   </section>
-
-  <nav class="daynav" aria-label="일자 바로가기">
-    <a href="#booking" style="--c:var(--sun)"><b>●</b> 예약</a>
-    <a href="#check" style="--c:var(--sun)"><b>●</b> 체크리스트</a>
-    <a href="#cost" style="--c:var(--sun)"><b>●</b> 비용</a>
-    <a href="#map" style="--c:var(--sea)"><b>●</b> 지도</a>
-    <a href="#day1" style="--c:var(--d1)"><b>●</b> 1일차</a>
-    <a href="#day2" style="--c:var(--d2)"><b>●</b> 2일차</a>
-    <a href="#day3" style="--c:var(--d3)"><b>●</b> 3일차</a>
-    <a href="#day4" style="--c:var(--d4)"><b>●</b> 4일차</a>
-  </nav>
-
-  <section class="day" id="day1" style="--c:var(--d1)">
-    <div class="dayhead">
-      <span class="no">DAY 1 · 11/27</span>
-      <h2>푸꾸옥 입국과 휴식</h2>
-      <span class="meta">밤늦게 도착해요. 공항에서 북부 숙소까지 차로 약 40분</span>
-      <a class="btn primary routebtn" data-route="day1" target="_blank" rel="noopener">공항 → 숙소 경로 보기</a>
-    </div>
-    <ol class="tl" data-stops='[
-      ["15:30","인천공항 1터미널 도착","제주항공 카운터에서 수속","출발 2시간 30분 전 도착 권장","Incheon International Airport Terminal 1"],
-      ["18:00","인천 출발 · 7C2315","제주항공 직항",null,null],
-      ["22:15","푸꾸옥 국제공항 도착","입국 심사, 짐 찾기",null,"Phu Quoc International Airport"],
-      ["23:00","빈펄 리조트로 이동","호텔 픽업 버스 · 약 40분","픽업 신청함 · 확정 답장 대기",null],
-      ["23:45","빈펄 리조트 앤 스파 체크인","늦은 체크인 요청해 둠 · 아이들 바로 재우기",null,"Vinpearl Resort & Spa Phu Quoc"]
-    ]'></ol>
-  </section>
-
-  <section class="day" id="day2" style="--c:var(--d2)">
-    <div class="dayhead">
-      <span class="no">DAY 2 · 11/28</span>
-      <h2>북부 테마파크 정복</h2>
-      <span class="meta">교통: 리조트 무료 셔틀 또는 Grab · 모두 숙소 근처 빈펄 단지에 모여 있어요</span>
-      <a class="btn primary routebtn" data-route="day2" target="_blank" rel="noopener">하루 동선 지도로 보기</a>
-    </div>
-    <ol class="tl" data-stops='[
-      ["09:00","빈펄 사파리 푸꾸옥","오픈형 야생 동물원, 사파리 버스 탑승","아들 만족도 최상 · 딸은 트램과 기린 먹이주기","Vinpearl Safari Phu Quoc"],
-      ["12:00","점심 · 웨일마운틴","한국인 입맛에 맞는 해산물·구이, 아이들용 볶음밥",null,"Whale Mountain restaurant Phu Quoc"],
-      ["13:30","빈원더스 푸꾸옥","대형 실내 아쿠아리움, 키즈 워터파크, 놀이기구",null,"VinWonders Phu Quoc"],
-      ["18:30","그랜드월드 푸꾸옥 · 저녁","유럽풍 운하 야경 감상 후 셔틀·Grab으로 숙소 복귀","20:15 대형 분수쇼","Grand World Phu Quoc"]
-    ]'></ol>
-  </section>
-
-  <section class="day" id="day3" style="--c:var(--d3)">
-    <div class="dayhead">
-      <span class="no">DAY 3 · 11/29</span>
-      <h2>리조트 호캉스와 즈엉동 시내</h2>
-      <span class="meta">교통: Grab · 남부 이동 없이 숙소와 즈엉동 시내만 오가요. 썬셋타운은 4일차 A코스에서 방문해요.</span>
-      <a class="btn primary routebtn" data-route="day3" target="_blank" rel="noopener">하루 동선 지도로 보기</a>
-    </div>
-    <ol class="tl" data-stops='[
-      ["09:00","리조트 호캉스 · 물놀이","대형 야외 수영장과 전용 해변에서 모래놀이, 리조트 조식","아이들 체력 보존","Vinpearl Resort & Spa Phu Quoc"],
-      ["14:30","킹콩마트 쇼핑","현지 과자, 망고, 기념품 편하게 장보기",null,"King Kong Mart Phu Quoc"],
-      ["15:30","촌촌 카페","시내가 한눈에 내려다보이는 언덕 위 카페에서 시원한 음료와 휴식",null,"Chuon Chuon Bistro Sky Bar Phu Quoc"],
-      ["17:30","저녁 · 메오키친","깔끔한 베트남 가정식, 위생 우수","어린이용 쌀국수 · 반쎄오","MEO Kitchen Phu Quoc"],
-      ["18:30","즈엉동 야시장 산책","철판 아이스크림, 땅콩 시식 등 길거리 구경","동선이 짧아 유모차 이동 쉬움","Phu Quoc Night Market Duong Dong"],
-      ["20:00","숙소 복귀 · 휴식","4일차 체크아웃과 귀국을 위해 일찍 취침",null,null]
-    ]'></ol>
-  </section>
-
-  <section class="day" id="day4" style="--c:var(--d4)">
-    <div class="dayhead">
-      <span class="no">DAY 4 · 11/30</span>
-      <h2>체크아웃 투어</h2>
-      <span class="meta">교통: 기사 포함 단독 차량 약 9시간(12:00~21:00) · 캐리어를 실어 두고 아이들은 차에서 쉴 수 있어요</span>
-    </div>
-    <ol class="tl" data-stops='[["12:00","빈펄 리조트 체크아웃","전용 차량에 짐 싣고 출발",null,"Vinpearl Resort & Spa Phu Quoc"]]'></ol>
-
-    <div class="opts" role="tablist" aria-label="4일차 코스 선택">
-      <button id="tabA" role="tab" aria-selected="true" aria-controls="optA">A · 남부 액티비티</button>
-      <button id="tabB" role="tab" aria-selected="false" aria-controls="optB">B · 시내 힐링</button>
-    </div>
-
-    <div id="optA" class="panel" role="tabpanel" aria-labelledby="tabA">
-      <p class="optdesc">아들과 딸 모두 즐길 볼거리 중심 코스</p>
-      <a class="btn primary routebtn" data-route="day4a" target="_blank" rel="noopener">A코스 동선 지도로 보기</a>
-      <ol class="tl" data-stops='[
-        ["12:30","남부 해안가 레스토랑 점심","",null,"seafood restaurant An Thoi Phu Quoc"],
-        ["14:00","혼똔섬 해상 케이블카 · 테마파크","바다 위를 건너는 세계 최장 케이블카, 섬 안 산책",null,"Hon Thom Cable Car Phu Quoc"],
-        ["16:30","썬셋타운 · 키스브릿지","지중해풍 거리 산책, 가족 사진, 노을 감상",null,"Kiss Bridge Phu Quoc"],
-        ["18:30","가족 스파 · 샤워 · 저녁","공항 근처 샤워 가능한 스파에서 피로 풀고 가볍게 저녁",null,"spa near Phu Quoc International Airport"]
-      ]'></ol>
-    </div>
-
-    <div id="optB" class="panel" role="tabpanel" aria-labelledby="tabB" hidden>
-      <p class="optdesc">4세 딸 체력을 배려한 편안한 코스</p>
-      <a class="btn primary routebtn" data-route="day4b" target="_blank" rel="noopener">B코스 동선 지도로 보기</a>
-      <ol class="tl" data-stops='[
-        ["12:30","시내 맛집 점심","",null,"restaurants Duong Dong Phu Quoc"],
-        ["13:30","온천 스파 또는 키즈카페","날씨 따라 머드·온천 스파 또는 실내 키즈카페",null,"mud bath spa Phu Quoc"],
-        ["15:00","뷰 카페 · 촌촌 / 느옥찌엔","언덕 위에서 시내가 내려다보이는 카페",null,"Chuon Chuon Bistro Sky Bar Phu Quoc"],
-        ["16:30","즈엉동 야시장 · 킹콩마트","망고, 기념품 마지막 장보기",null,"Phu Quoc Night Market Duong Dong"],
-        ["18:30","가족 스파 · 샤워 · 저녁","공항 근처 샤워 가능한 스파, 가볍게 저녁",null,"spa near Phu Quoc International Airport"]
-      ]'></ol>
-    </div>
-
-    <div class="dayhead" style="--c:var(--sea);margin-top:6px">
-      <span class="no">공통 · 공항 이동</span>
-    </div>
-    <ol class="tl" data-stops='[
-      ["20:30","공항으로 이동","단독 차량 샌딩",null,"Phu Quoc International Airport"],
-      ["21:00","공항 도착 · 탑승 수속","출발 2시간 전",null,null],
-      ["23:15","푸꾸옥 출발 · 7C2316","12/1(화) 06:35 인천 1터미널 도착",null,null]
-    ]'></ol>
-  </section>
-
-  <div class="note">
-    <h3>링크 사용법</h3>
-    <ul>
-      <li><b>지도</b>: 구글지도 앱에서 장소를 열어요. 사진·리뷰·영업시간도 거기서 볼 수 있어요.</li>
-      <li><b>사진</b>: 구글 이미지 검색으로 장소 사진을 보여줘요.</li>
-      <li>웨일마운틴, 느옥찌엔처럼 한국어 별칭으로 알려진 곳은 검색 결과가 맞는지 한 번 확인해 주세요.</li>
-    </ul>
   </div>
+
   <footer>이동 시간과 예상 비용은 대략적인 값이고, 테마파크 운영시간은 현지 사정에 따라 달라질 수 있어요.</footer>
 </div>
 
@@ -583,8 +680,16 @@ const all={id:'all',label:'전체',c:'--ink'};
     routeG.querySelectorAll('.svg-route').forEach(pl=>{pl.style.display=(r.id==='all'||pl.dataset.id===r.id)?'':'none';});
     const keep=r.id==='all'?null:new Set(r.path);
     svg.querySelectorAll('[data-k]').forEach(m=>{m.style.display=(!keep||keep.has(m.dataset.k))?'':'none';});
-    plist.querySelectorAll('li').forEach(li=>{li.hidden=!!keep&&!keep.has(li.dataset.k);});};
+    plist.querySelectorAll('li').forEach(li=>{li.hidden=!!keep&&!keep.has(li.dataset.k);});
+    setMapLink(r);};
   filters.append(b);});
+/* tapping the sketch opens Google Maps: the selected day's route, or the island */
+const mapLink=document.getElementById('mapLink');
+function setMapLink(r){
+  if(r.id==='all'){mapLink.href='https://www.google.com/maps/search/?api=1&query=Phu+Quoc';mapLink.textContent='구글지도로 보기 ↗';}
+  else{mapLink.href=routeUrl(r);mapLink.textContent=r.label+' 경로 구글지도로 ↗';}
+}
+svg.addEventListener('click',e=>{if(e.target.closest('a'))return;mapLink.click();});
 
 /* ---------- timelines ---------- */
 const ico={
@@ -615,42 +720,48 @@ try{const s=localStorage.getItem('pq-opt');if(s)pick(s)}catch(e){}
 const API_URL='https://script.google.com/macros/s/AKfycbyR_rFx0NCN4NQqULiZhu7qgcUyjx-rxQ9ARZI1l09zy6x3r0OjlMP2JNMNaz5gmZ5h/exec';
 const RATE={KRW:1,VND:0.054,USD:1400};
 const BUDGET_MAX=3550000;
-const TODO=[
- ["passport","여권 유효기간 확인 (4명)","입국일 기준 6개월 이상 남아야 해요. 아이들 여권도 확인"],
- ["family-cert","영문 가족관계증명서 준비","아이들과 함께 갈 때 챙기면 좋아요. 정부24에서 발급"],
- ["insurance","여행자보험 가입","4인 가족 플랜"],
- ["data","데이터 준비","eSIM 또는 로밍"],
- ["grab","Grab 앱 설치·결제수단 등록","출국 전에 가입과 카드 등록까지"],
- ["money","환전","달러로 가져가 현지 환전하거나 트래블카드 준비"],
- ["pickup-confirm","호텔 픽업 버스 확정 답장 받기","11/5 신청 메일 보냄 · 도착 1주 전까지 답이 없으면 하나투어(1577-1233)나 호텔(+84-297-3550550)에 확인"],
- ["day4-route","4일차 A/B 코스 결정",""],
- ["day4-car","4일차 기사 포함 차량 예약","12:00~21:00, 약 9시간 · 7인승"],
- ["tickets","빈펄 사파리·빈원더스 입장권 구매","미리 사면 현장보다 싼 경우가 많아요"],
- ["cable","혼똔 케이블카 티켓 (A코스일 때)",""],
- ["spa","4일차 스파 예약","샤워 가능한 곳, 18:30 · 4인"],
- ["checkin","제주항공 좌석 지정·온라인 체크인","가족 좌석 붙여 앉기, 위탁수하물 허용량 확인"],
- ["kids","아이 준비물","수영복·래시가드, 선크림, 모기 기피제, 상비약, 유모차"],
- ["home","12/1(화) 귀가 교통·일정 확인","06:35 인천 도착 · 출근·등교 일정 조정"]
+const DEFAULT_TASKS=[
+ ["passport","여권 유효기간 확인 (4명)","입국일 기준 6개월 이상 남아야 해요. 아이들 여권도 확인",0],
+ ["family-cert","영문 가족관계증명서 준비","아이들과 함께 갈 때 챙기면 좋아요. 정부24에서 발급",0],
+ ["insurance","여행자보험 가입","4인 가족 플랜",0],
+ ["data","데이터 준비","eSIM 또는 로밍",0],
+ ["grab","Grab 앱 설치·결제수단 등록","출국 전에 가입과 카드 등록까지",0],
+ ["money","환전","달러로 가져가 현지 환전하거나 트래블카드 준비",0],
+ ["pickup-confirm","호텔 픽업 버스 확정 답장 받기","11/5 신청 메일 보냄 · 도착 1주 전까지 답이 없으면 하나투어(1577-1233)나 호텔(+84-297-3550550)에 확인",0],
+ ["day4-route","4일차 A/B 코스 결정","",0],
+ ["day4-car","4일차 기사 포함 차량 예약","12:00~21:00, 약 9시간 · 7인승",0],
+ ["tickets","빈펄 사파리·빈원더스 입장권 구매","미리 사면 현장보다 싼 경우가 많아요",0],
+ ["cable","혼똔 케이블카 티켓 (A코스일 때)","",0],
+ ["spa","4일차 스파 예약","샤워 가능한 곳, 18:30 · 4인",0],
+ ["checkin","제주항공 좌석 지정·온라인 체크인","가족 좌석 붙여 앉기, 위탁수하물 허용량 확인",0],
+ ["kids","아이 준비물","수영복·래시가드, 선크림, 모기 기피제, 상비약, 유모차",0],
+ ["home","12/1(화) 귀가 교통·일정 확인","06:35 인천 도착 · 출근·등교 일정 조정",0],
+ ["book-flight","항공권 결제","제주항공 7C2315 / 7C2316, 4인",1],
+ ["book-hotel","호텔 결제","빈펄 리조트 앤 스파 3박, 조식 포함",1],
+ ["hotel-req","호텔 늦은 체크인·금연·고층 요청","밤 11시 넘어 도착하는 일정에 맞춰 요청됨",1],
+ ["plan","일정·동선 확정","4일차 A/B 코스만 남음",1],
+ ["pickup-mail","도착일 호텔 픽업 버스 신청 메일 발송","11/5 보냄",1]
 ];
 const SEED=[
  {id:"seed-flight",date:"2026-11-05",item:"항공권 · 제주항공 4인",cat:"항공",amount:1240400,cur:"KRW",payer:"",memo:"결제 완료",createdAt:"2026-11-05T00:00:00Z"},
  {id:"seed-hotel",date:"2026-11-05",item:"호텔 · 빈펄 리조트 3박 조식 포함",cat:"숙소",amount:874229,cur:"KRW",payer:"",memo:"결제 완료",createdAt:"2026-11-05T00:00:01Z"}
 ];
 const CATC={항공:"--d3",숙소:"--d2",교통:"--sea",식비:"--d4",입장권:"--d1",쇼핑:"--sun",스파:"--d4b",기타:"--muted"};
+const $=id=>document.getElementById(id);
 const ls=(k,v)=>{try{if(v===undefined)return JSON.parse(localStorage.getItem(k)||'null');localStorage.setItem(k,JSON.stringify(v));}catch(e){return null;}};
 const won=n=>Math.round(n).toLocaleString('ko-KR');
 const krw=x=>(Number(x.amount)||0)*(RATE[x.cur]||1);
-const store={checks:{},expenses:[]};
+const store={checks:{},expenses:[],bookings:[]};
 let pending=0;
 
 /* local fallback, carrying over checks saved before sharing existed */
 function loadLocal(){
   let l=ls('pq-local');
-  if(!l){l={checks:{},expenses:SEED.slice()};const old=ls('pq-todo')||{};
+  if(!l){l={checks:{},expenses:SEED.slice(),bookings:[]};const old=ls('pq-todo')||{};
     Object.keys(old).forEach(k=>{if(old[k])l.checks[k]={done:true,by:'',at:''};});}
-  store.checks=l.checks||{};store.expenses=l.expenses||[];
+  store.checks=l.checks||{};store.expenses=l.expenses||[];store.bookings=l.bookings||[];
 }
-function saveLocal(){if(!API_URL)ls('pq-local',{checks:store.checks,expenses:store.expenses});}
+function saveLocal(){if(!API_URL)ls('pq-local',{checks:store.checks,expenses:store.expenses,bookings:store.bookings});}
 
 const syncEl=document.getElementById('sync');
 function setSync(state,msg){syncEl.className='sync '+state;syncEl.textContent=msg;}
@@ -660,7 +771,7 @@ async function pull(){
   try{const r=await fetch(API_URL+'?t='+Date.now());const d=await r.json();
     if(!d.ok)throw new Error(d.error);
     if(pending)return;
-    store.checks=d.checks||{};store.expenses=d.expenses||[];
+    store.checks=d.checks||{};store.expenses=d.expenses||[];store.bookings=d.bookings||[];
     setSync('ok','함께 쓰는 중 · '+new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'})+' 동기화');
     renderAll();
   }catch(e){setSync('err','동기화 실패 · 잠시 후 다시 시도해요');}
@@ -681,19 +792,94 @@ meEl.value=ls('pq-me')||'';
 const me=()=>meEl.value.trim();
 meEl.addEventListener('change',()=>{ls('pq-me',me());const p=document.getElementById('exPayer');if(!p.value)p.value=me();});
 
-/* checklist */
-const tdl=document.getElementById('todo');
-function renderTodo(){
-  tdl.innerHTML=TODO.map(([id,t,d])=>{const c=store.checks[id]||{};
-    const by=c.done&&c.by?`<span class="by">${esc(c.by)} 체크</span>`:'';
-    return `<li><label for="t-${id}"><input type="checkbox" id="t-${id}" data-id="${id}" ${c.done?'checked':''}><span>${t}${d?`<small>${d}</small>`:''}${by}</span></label></li>`;}).join('');
-  const n=TODO.filter(([id])=>store.checks[id]&&store.checks[id].done).length;
-  document.getElementById('todoCnt').textContent=`${n} / ${TODO.length}`;
-  document.getElementById('todoBar').style.width=(n/TODO.length*100)+'%';
+/* checklist: 할 일 → 한 일, inline edit, add */
+const now=()=>new Date().toISOString();
+const uid=p=>p+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+let editingTask=null,taskDirty=false,lastMoved=null;
+function allTasks(){
+  const out=[],seen={};
+  DEFAULT_TASKS.forEach(([id,t,n,d],i)=>{seen[id]=1;const r=store.checks[id];if(r&&r.deleted)return;
+    out.push({id,title:(r&&r.title)||t,note:r&&r.title?r.note||'':n,done:r?!!r.done:!!d,by:(r&&r.by)||'',at:(r&&r.at)||'',ord:i,created:''});});
+  Object.keys(store.checks).forEach(id=>{const r=store.checks[id];if(seen[id]||r.deleted||!r.title)return;
+    out.push({id,title:r.title,note:r.note||'',done:!!r.done,by:r.by||'',at:r.at||'',ord:1e4,created:r.createdAt||''});});
+  return out;
 }
-tdl.addEventListener('change',e=>{const i=e.target;if(!i.dataset.id)return;
-  store.checks[i.dataset.id]={done:i.checked,by:me(),at:new Date().toISOString()};
-  renderTodo();push({action:'check',id:i.dataset.id,done:i.checked,by:me()});});
+function taskLi(t){
+  const by=t.done&&t.by?`<span class="by">${esc(t.by)} 체크</span>`:'';
+  return `<li data-id="${esc(t.id)}"${t.id===lastMoved?' class="moved"':''}><input type="checkbox" class="tchk" id="c-${esc(t.id)}" aria-label="${esc(t.title)} ${t.done?'다시 할 일로':'완료'}" ${t.done?'checked':''}>`+
+    `<div class="tx" role="button" tabindex="0" title="눌러서 고치기">${esc(t.title)}${t.note?`<small>${esc(t.note)}</small>`:''}${by}</div></li>`;
+}
+function renderTodo(){
+  if(editingTask){taskDirty=true;return;}
+  const ts=allTasks();
+  const todo=ts.filter(t=>!t.done).sort((a,b)=>a.ord-b.ord||a.created.localeCompare(b.created));
+  const done=ts.filter(t=>t.done).sort((a,b)=>(b.at||'').localeCompare(a.at||'')||a.ord-b.ord);
+  $('todoList').innerHTML=todo.length?todo.map(taskLi).join(''):'<li class="empty" style="display:block">할 일을 다 했어요</li>';
+  $('doneList').innerHTML=done.length?done.map(taskLi).join(''):'<li class="empty" style="display:block">아직 없어요</li>';
+  $('todoCnt').textContent=`${todo.length}개 남음`;$('doneCnt').textContent=`${done.length}개`;
+  $('todoBar').style.width=(ts.length?done.length/ts.length*100:0)+'%';
+  $('tabCheckBadge').textContent=`${done.length}/${ts.length}`;
+  lastMoved=null;taskDirty=false;
+}
+function openTaskEdit(li){
+  if(editingTask)return;
+  const id=li.dataset.id,t=allTasks().find(x=>x.id===id);if(!t)return;
+  editingTask=id;
+  li.querySelector('.tx').outerHTML=`<form class="taskform" novalidate>
+    <input class="inp" name="title" maxlength="100" value="${esc(t.title)}" aria-label="할 일">
+    <input class="inp" name="note" maxlength="200" value="${esc(t.note)}" placeholder="메모 (선택)" aria-label="메모">
+    <div class="tfbtns"><button class="go" type="submit">저장</button><button class="ghostbtn" type="button" data-act="cancel">취소</button><button class="del" type="button" data-act="del">삭제</button></div></form>`;
+  const inp=li.querySelector('[name=title]');inp.focus();inp.setSelectionRange(inp.value.length,inp.value.length);
+}
+function closeTaskEdit(){editingTask=null;renderTodo();}
+['todoList','doneList'].forEach(lid=>{
+  const el=$(lid);
+  el.addEventListener('change',e=>{
+    if(!e.target.classList.contains('tchk'))return;
+    const id=e.target.closest('li').dataset.id,done=e.target.checked;
+    const t=allTasks().find(x=>x.id===id);
+    store.checks[id]=Object.assign({},store.checks[id]||{},{done,by:me(),at:now()});
+    lastMoved=id;if(editingTask===id)editingTask=null;renderTodo();
+    push({action:'check',id,done,by:me()});
+  });
+  el.addEventListener('click',e=>{
+    const tx=e.target.closest('.tx');if(tx){openTaskEdit(tx.closest('li'));return;}
+    const btn=e.target.closest('[data-act]');if(!btn)return;
+    const id=btn.closest('li').dataset.id;
+    if(btn.dataset.act==='cancel'){closeTaskEdit();return;}
+    if(btn.dataset.act==='del'){
+      if(!btn.dataset.armed){btn.dataset.armed='1';btn.textContent='정말 삭제';setTimeout(()=>{if(btn.isConnected){delete btn.dataset.armed;btn.textContent='삭제';}},3000);return;}
+      store.checks[id]=Object.assign({},store.checks[id]||{},{deleted:true});closeTaskEdit();
+      push({action:'deleteTask',id,by:me()});
+    }
+  });
+  el.addEventListener('keydown',e=>{
+    const tx=e.target.closest('.tx');
+    if(tx&&(e.key==='Enter'||e.key===' ')){e.preventDefault();openTaskEdit(tx.closest('li'));}
+    if(e.key==='Escape'&&e.target.closest('.taskform'))closeTaskEdit();
+  });
+  el.addEventListener('submit',e=>{
+    e.preventDefault();const fm=e.target,id=fm.closest('li').dataset.id;
+    const title=fm.elements.title.value.trim(),note=fm.elements.note.value.trim();
+    if(!title){fm.elements.title.focus();return;}
+    const t=allTasks().find(x=>x.id===id)||{done:false};
+    store.checks[id]=Object.assign({},store.checks[id]||{done:t.done,by:'',at:''},{title,note,deleted:false});
+    closeTaskEdit();
+    push({action:'saveTask',task:{id,title,note,done:t.done},by:me()});
+  });
+});
+$('addTaskBtn').addEventListener('click',()=>{$('addTaskForm').hidden=false;$('addTaskBtn').hidden=true;$('newTitle').focus();});
+$('addTaskCancel').addEventListener('click',()=>{$('addTaskForm').hidden=true;$('addTaskBtn').hidden=false;$('addTaskMsg').textContent='';});
+$('addTaskForm').addEventListener('submit',e=>{
+  e.preventDefault();
+  const title=$('newTitle').value.trim(),note=$('newNote').value.trim();
+  if(!title){$('addTaskMsg').textContent='할 일을 입력해 주세요';$('newTitle').focus();return;}
+  const id=uid('u');
+  store.checks[id]={done:false,by:me(),at:'',title,note,deleted:false,createdAt:now()};
+  lastMoved=id;renderTodo();
+  $('newTitle').value='';$('newNote').value='';$('addTaskMsg').textContent=`추가했어요 · ${title}`;$('newTitle').focus();
+  push({action:'saveTask',task:{id,title,note,done:false},by:me()});
+});
 
 /* expenses */
 function bars(el,map,colorOf){
@@ -730,7 +916,6 @@ document.getElementById('exList').addEventListener('click',e=>{
 const form=document.getElementById('exForm'),msg=document.getElementById('exMsg');
 document.getElementById('exDate').value=new Date().toLocaleDateString('sv-SE');
 document.getElementById('exPayer').value=me();
-const $=id=>document.getElementById(id);
 let editingId=null;
 function resetForm(){
   editingId=null;$('exCard').classList.remove('editing');$('exTitle').textContent='지출 추가';
@@ -814,12 +999,129 @@ $('exPhoto').addEventListener('change',async e=>{
   finally{clearInterval(tick);photoBtn.disabled=false;}
 });
 
-function renderAll(){renderTodo();renderExpenses();}
+
+/* bookings */
+const BK2CAT={'항공':'항공','숙소':'숙소','입장권·투어':'입장권','교통':'교통','식당':'식비','스파':'스파','기타':'기타'};
+const WD='일월화수목금토';
+const fmtDay=d=>{if(!d)return '';const t=new Date(d+'T00:00:00');return `${d.slice(5).replace('-','/')}(${WD[t.getDay()]})`;};
+let editingBk=null;
+function renderBookings(){
+  const xs=store.bookings.slice().sort((a,b)=>((a.date||'9')+(a.time||'')).localeCompare((b.date||'9')+(b.time||''))||a.createdAt.localeCompare(b.createdAt));
+  $('bkCnt').textContent=xs.length?xs.length+'건':'';
+  $('bkList').innerHTML=xs.length?xs.map(x=>`<li class="bkitem">
+    <div class="bh"><span class="cat">${esc(x.type)}</span><b>${esc(x.title)}</b>${x.date?`<span class="when">${fmtDay(x.date)}${x.time?' '+esc(x.time):''}</span>`:''}</div>
+    <dl class="kv">
+      ${x.place?`<dt>장소</dt><dd><a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(x.place+' Phu Quoc')}" target="_blank" rel="noopener">${esc(x.place)}</a></dd>`:''}
+      ${x.confirmNo?`<dt>예약번호</dt><dd class="mono">${esc(x.confirmNo)}</dd>`:''}
+      ${x.amount>0?`<dt>금액</dt><dd class="mono">${won(krw(x))}원${x.cur!=='KRW'?` (${Number(x.amount).toLocaleString('ko-KR')} ${x.cur})`:''}</dd>`:''}
+      ${x.memo?`<dt>메모</dt><dd>${esc(x.memo)}</dd>`:''}
+    </dl>
+    <div class="rowbtns"><button class="edit" type="button" data-id="${esc(x.id)}">수정</button><button class="del" type="button" data-id="${esc(x.id)}">삭제</button></div>
+  </li>`).join(''):'<li class="empty">아직 추가한 예약이 없어요. 입장권, 픽업, 스파처럼 예약한 것을 기록해 두세요.</li>';
+}
+function bkReset(){
+  editingBk=null;$('bkHead').textContent='예약 추가';$('bkSubmit').textContent='추가';$('bkExpWrap').hidden=false;
+  ['bkName','bkNo','bkDate','bkTime','bkPlace','bkAmt','bkMemo'].forEach(i=>$(i).value='');
+  $('bkType').selectedIndex=0;$('bkCur').value='KRW';$('bkToExp').checked=true;
+  $('bkThumb').hidden=true;$('bkPhotoMsg').textContent='예약 확인 화면이나 바우처를 캡처해서 올리면 내용을 자동으로 채워요';
+}
+function bkOpen(){ $('bkCard').hidden=false;$('bkAddBtn').hidden=true; }
+function bkClose(){ bkReset();$('bkCard').hidden=true;$('bkAddBtn').hidden=false; }
+$('bkAddBtn').addEventListener('click',()=>{bkReset();bkOpen();$('bkMsg').textContent='';$('bkNote').textContent='';$('bkName').focus();});
+$('bkCancel').addEventListener('click',()=>{bkClose();});
+$('bkList').addEventListener('click',e=>{
+  const ed=e.target.closest('.edit');
+  if(ed){const x=store.bookings.find(v=>v.id===ed.dataset.id);if(!x)return;
+    bkReset();editingBk=x.id;$('bkHead').textContent='예약 수정';$('bkSubmit').textContent='저장';$('bkExpWrap').hidden=true;
+    $('bkType').value=x.type;$('bkName').value=x.title;$('bkNo').value=x.confirmNo||'';$('bkDate').value=x.date||'';$('bkTime').value=x.time||'';
+    $('bkPlace').value=x.place||'';$('bkAmt').value=x.amount?Number(x.amount).toLocaleString('ko-KR'):'';$('bkCur').value=x.cur||'KRW';$('bkMemo').value=x.memo||'';
+    bkOpen();$('bkMsg').textContent='고친 뒤 저장을 눌러 주세요';
+    $('bkCard').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});return;}
+  const btn=e.target.closest('.del');if(!btn)return;
+  if(!btn.dataset.armed){btn.dataset.armed='1';btn.textContent='정말 삭제';setTimeout(()=>{if(btn.isConnected){delete btn.dataset.armed;btn.textContent='삭제';}},3000);return;}
+  const id=btn.dataset.id;if(editingBk===id)bkClose();
+  store.bookings=store.bookings.filter(x=>x.id!==id);renderBookings();push({action:'deleteBooking',id});
+});
+$('bkForm').addEventListener('submit',async e=>{
+  e.preventDefault();const m=$('bkMsg');
+  const title=$('bkName').value.trim();
+  const amount=Number(($('bkAmt').value||'0').replace(/[,\s]/g,''));
+  if(!title){m.textContent='예약 이름을 입력해 주세요';$('bkName').focus();return;}
+  if(!(amount>=0)){m.textContent='금액은 숫자로 입력해 주세요';$('bkAmt').focus();return;}
+  const fields={type:$('bkType').value,title,date:$('bkDate').value,time:$('bkTime').value,place:$('bkPlace').value.trim(),
+    confirmNo:$('bkNo').value.trim(),amount,cur:$('bkCur').value,memo:$('bkMemo').value.trim()};
+  let x,action,exp=null;
+  if(editingBk){const old=store.bookings.find(v=>v.id===editingBk);if(!old){bkClose();return;}
+    Object.assign(old,fields);x=old;action='updateBooking';}
+  else{x=Object.assign({id:uid('b'),createdAt:now()},fields);store.bookings.push(x);action='addBooking';
+    if($('bkToExp').checked&&amount>0){
+      exp={id:uid('e'),createdAt:now(),date:new Date().toLocaleDateString('sv-SE'),item:title,cat:BK2CAT[x.type]||'기타',
+        amount,cur:x.cur,payer:me(),memo:'예약'+(x.confirmNo?' '+x.confirmNo:'')};
+      store.expenses.push(exp);renderExpenses();}}
+  renderBookings();bkClose();
+  const ok=await push({action,booking:x});
+  if(exp&&ok)await push({action:'addExpense',expense:exp});
+  $('bkNote').textContent=ok?`${action==='addBooking'?'추가':'수정'}했어요 · ${x.title}${exp?' (지출에도 기록)':''}`:'저장하지 못했어요. 인터넷 연결을 확인하고 다시 시도해 주세요';
+});
+/* shared photo reader */
+async function readPhoto(file,action,ui){
+  if(!API_URL){ui.msg.textContent='사진 읽기는 공유 저장소에 연결된 사이트에서만 돼요';return null;}
+  ui.btn.disabled=true;const t0=Date.now();ui.msg.textContent='사진을 읽는 중이에요';
+  const tick=setInterval(()=>{ui.msg.textContent=`사진을 읽는 중이에요 · ${Math.round((Date.now()-t0)/1000)}초`;},1000);
+  try{
+    const dataUrl=await shrink(file);
+    ui.img.src=dataUrl;ui.thumb.hidden=false;ui.thumb.onclick=()=>{$('photoBig').src=dataUrl;try{pv.showModal();}catch(e){pv.setAttribute('open','');}};
+    const r=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body:JSON.stringify({action,image:dataUrl.split(',')[1],mime:'image/jpeg'})});
+    const d=await r.json();if(!d.ok)throw new Error(d.error);
+    d.fields.secs=((Date.now()-t0)/1000).toFixed(1);return d.fields;
+  }catch(err){ui.msg.textContent='사진을 읽지 못했어요 · '+(err.message||'다시 시도해 주세요');return null;}
+  finally{clearInterval(tick);ui.btn.disabled=false;}
+}
+$('bkPhotoBtn').addEventListener('click',()=>{if(!API_URL){$('bkPhotoMsg').textContent='사진 읽기는 공유 저장소에 연결된 사이트에서만 돼요';return;}$('bkPhoto').click();});
+$('bkPhoto').addEventListener('change',async e=>{
+  const file=e.target.files&&e.target.files[0];e.target.value='';if(!file)return;
+  const f=await readPhoto(file,'readBooking',{btn:$('bkPhotoBtn'),msg:$('bkPhotoMsg'),img:$('bkPhotoPrev'),thumb:$('bkThumb')});
+  if(!f)return;
+  if(!f.title&&!f.confirmNo&&!f.date){$('bkPhotoMsg').textContent='예약 내용을 찾지 못했어요. 직접 입력해 주세요';return;}
+  $('bkType').value=f.type;if(f.title)$('bkName').value=f.title;if(f.confirmNo)$('bkNo').value=f.confirmNo;
+  if(f.date)$('bkDate').value=f.date;if(f.time)$('bkTime').value=f.time;if(f.place)$('bkPlace').value=f.place;
+  if(f.amount>0){$('bkAmt').value=Number(f.amount).toLocaleString('ko-KR');$('bkCur').value=f.cur;}
+  if(f.memo)$('bkMemo').value=f.memo;
+  $('bkPhotoMsg').textContent=`${f.secs}초 만에 읽었어요: ${f.title||'이름 없음'}${f.date?' · '+fmtDay(f.date):''}. 맞는지 확인하고 ${editingBk?'저장을':'추가를'} 눌러 주세요`;
+});
+
+function renderAll(){renderTodo();renderExpenses();renderBookings();}
 loadLocal();renderAll();
 if(API_URL){setSync('','불러오는 중');pull();
   setInterval(()=>{if(document.visibilityState==='visible')pull();},30000);
   document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')pull();});
 }else setSync('local','이 기기에만 저장 중');
+
+/* ---------- tabs ---------- */
+const TABS=['schedule','map','check','cost','booking'];
+function showTab(name,push){
+  if(TABS.indexOf(name)<0)name='schedule';
+  TABS.forEach(t=>{const on=t===name;document.getElementById('tab-'+t).setAttribute('aria-selected',on);document.getElementById('p-'+t).hidden=!on;});
+  if(push&&location.hash!=='#'+name){try{history.replaceState(null,'','#'+name);}catch(e){location.hash=name;}}
+  const bar=document.querySelector('.tabs');if(push&&bar.getBoundingClientRect().top<=0)window.scrollTo({top:bar.offsetTop-0});
+}
+document.querySelector('.tabs').addEventListener('click',e=>{const b=e.target.closest('[data-tab]');if(b)showTab(b.dataset.tab,true);});
+window.addEventListener('hashchange',()=>showTab(location.hash.slice(1)));
+/* day sub-tabs: default to today during the trip, else last viewed */
+const DAYS=['day1','day2','day3','day4'];
+function showDay(d,save){
+  if(DAYS.indexOf(d)<0)d='day1';
+  DAYS.forEach(x=>{const on=x===d;document.getElementById('dt-'+x).setAttribute('aria-selected',on);document.getElementById(x).hidden=!on;});
+  if(save)try{localStorage.setItem('pq-day',d);}catch(e){}
+}
+document.querySelector('.daytabs').addEventListener('click',e=>{const b=e.target.closest('[data-day]');if(b)showDay(b.dataset.day,true);});
+const todayStr=new Date().toLocaleDateString('sv-SE',{timeZone:'Asia/Seoul'});
+const tripDay={'2026-11-27':'day1','2026-11-28':'day2','2026-11-29':'day3','2026-11-30':'day4'}[todayStr];
+if(tripDay)document.getElementById('dt-'+tripDay).classList.add('today');
+let startDay=tripDay;if(!startDay)try{startDay=localStorage.getItem('pq-day');}catch(e){}
+showDay(startDay||'day1');
+showTab(location.hash.slice(1));
 </script>
 
 </body>
