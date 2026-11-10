@@ -228,8 +228,7 @@ dialog.pv .pvbar{display:flex;justify-content:center;padding-top:10px}
 .tl2 .tx:focus-visible{outline:2px solid var(--sea)}
 .tl2 small{display:block;color:var(--muted);font-size:12px;line-height:1.45}
 .tl2 .by{display:block;font-size:11px;color:var(--sea);margin-top:1px}
-#doneList .tx{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--line)}
-#doneList .tx small,#doneList .by{text-decoration:none}
+#doneList .tx{color:var(--muted)}
 .tl2 li.moved{animation:moved 1.2s ease-out}
 @keyframes moved{from{background:var(--chip)}to{background:transparent}}
 @media (prefers-reduced-motion:reduce){.tl2 li.moved{animation:none}}
@@ -443,7 +442,9 @@ details.card[open] summary{margin-bottom:6px}
       <div class="sum"><span>예상 상한 대비 남은 돈</span><b id="sumLeft">-</b></div>
     </div>
 
-    <div class="card" id="exCard">
+    <div class="secthead"><h3>지출 기록</h3><button type="button" class="ghostbtn" id="exAddBtn">+ 지출 추가</button></div>
+    <span class="formmsg" id="exNote"></span>
+    <div class="card" id="exCard" hidden>
       <h3 id="exTitle">지출 추가</h3>
       <form id="exForm" class="exform" novalidate>
         <div class="f wide">
@@ -466,7 +467,7 @@ details.card[open] summary{margin-bottom:6px}
         <div class="f"><label for="exDate">날짜</label><input class="inp" type="date" id="exDate" min="2026-10-01" max="2026-12-31"></div>
         <div class="f"><label for="exPayer">낸 사람</label><input class="inp" id="exPayer" maxlength="30" list="payers" placeholder="이름"><datalist id="payers"></datalist></div>
         <div class="f wide"><label for="exMemo">메모 (선택)</label><input class="inp" id="exMemo" maxlength="200" placeholder="예: 현금 결제"></div>
-        <div class="act"><button class="go" id="exSubmit" type="submit">추가</button><button class="ghostbtn" id="exCancel" type="button" hidden>취소</button><button class="ghostbtn" id="exClear" type="button">입력 지우기</button><span class="formmsg" id="exMsg">VND는 1,000동 ≈ 54원, USD는 1달러 ≈ 1,400원으로 환산해요</span></div>
+        <div class="act"><button class="go" id="exSubmit" type="submit">추가</button><button class="ghostbtn" id="exCancel" type="button">닫기</button><button class="ghostbtn" id="exClear" type="button">입력 지우기</button><span class="formmsg" id="exMsg">VND는 1,000동 ≈ 54원, USD는 1달러 ≈ 1,400원으로 환산해요</span></div>
       </form>
     </div>
 
@@ -917,9 +918,12 @@ const form=document.getElementById('exForm'),msg=document.getElementById('exMsg'
 document.getElementById('exDate').value=new Date().toLocaleDateString('sv-SE');
 document.getElementById('exPayer').value=me();
 let editingId=null;
+function exOpen(){$('exCard').hidden=false;$('exAddBtn').hidden=true;$('exNote').textContent='';}
+function exClose(){$('exCard').hidden=true;$('exAddBtn').hidden=false;}
+$('exAddBtn').addEventListener('click',()=>{resetForm();exOpen();msg.textContent='VND는 1,000동 ≈ 54원, USD는 1달러 ≈ 1,400원으로 환산해요';$('exItem').focus();});
 function resetForm(){
   editingId=null;$('exCard').classList.remove('editing');$('exTitle').textContent='지출 추가';
-  $('exSubmit').textContent='추가';$('exCancel').hidden=true;$('exClear').hidden=false;
+  $('exSubmit').textContent='추가';$('exCancel').textContent='닫기';$('exClear').hidden=false;
   ['exItem','exAmt','exMemo'].forEach(i=>$(i).value='');
   $('exDate').value=new Date().toLocaleDateString('sv-SE');$('exPayer').value=me();
   $('exThumb').hidden=true;$('exPhotoMsg').textContent='사진을 찍거나 고르면 항목·금액·날짜를 자동으로 채워요. 추가 전에 한 번 확인해 주세요';
@@ -927,14 +931,14 @@ function resetForm(){
 function startEdit(id){
   const x=store.expenses.find(v=>v.id===id);if(!x)return;
   editingId=id;$('exCard').classList.add('editing');$('exTitle').textContent='지출 수정';
-  $('exSubmit').textContent='저장';$('exCancel').hidden=false;$('exClear').hidden=true;
+  $('exSubmit').textContent='저장';$('exCancel').textContent='취소';$('exClear').hidden=true;
   $('exItem').value=x.item;$('exAmt').value=Number(x.amount).toLocaleString('ko-KR');$('exCur').value=x.cur;
   $('exCat').value=x.cat;$('exDate').value=x.date;$('exPayer').value=x.payer||'';$('exMemo').value=x.memo||'';
-  msg.textContent='고친 뒤 저장을 눌러 주세요';
+  exOpen();msg.textContent='고친 뒤 저장을 눌러 주세요';
   $('exThumb').hidden=true;$('exPhotoMsg').textContent='영수증 사진을 다시 올리면 이 지출 내용을 사진 기준으로 바꿔요';
   $('exCard').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});
 }
-$('exCancel').addEventListener('click',()=>{resetForm();msg.textContent='수정을 취소했어요';});
+$('exCancel').addEventListener('click',()=>{const wasEdit=!!editingId;resetForm();exClose();$('exNote').textContent=wasEdit?'수정을 취소했어요':'';});
 $('exClear').addEventListener('click',()=>{resetForm();$('exCat').selectedIndex=0;$('exCur').value='KRW';msg.textContent='입력한 내용을 지웠어요';$('exItem').focus();});
 form.addEventListener('submit',async e=>{
   e.preventDefault();
@@ -954,9 +958,9 @@ form.addEventListener('submit',async e=>{
     x=Object.assign({id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),createdAt:new Date().toISOString()},fields);
     store.expenses.push(x);action='addExpense';
   }
-  renderExpenses();resetForm();
+  renderExpenses();resetForm();exClose();
   const ok=await push({action,expense:x});
-  msg.textContent=ok?`${action==='addExpense'?'추가':'수정'}했어요 · ${x.item} ${won(krw(x))}원`:'저장하지 못했어요. 인터넷 연결을 확인하고 다시 시도해 주세요';
+  $('exNote').textContent=ok?`${action==='addExpense'?'추가':'수정'}했어요 · ${x.item} ${won(krw(x))}원`:'저장하지 못했어요. 인터넷 연결을 확인하고 다시 시도해 주세요';
 });
 
 /* receipt photo → fields */
