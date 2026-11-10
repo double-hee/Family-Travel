@@ -320,7 +320,7 @@ details.card[open] summary{margin-bottom:6px}
         <div class="f"><label for="exDate">날짜</label><input class="inp" type="date" id="exDate" min="2026-10-01" max="2026-12-31"></div>
         <div class="f"><label for="exPayer">낸 사람</label><input class="inp" id="exPayer" maxlength="30" list="payers" placeholder="이름"><datalist id="payers"></datalist></div>
         <div class="f wide"><label for="exMemo">메모 (선택)</label><input class="inp" id="exMemo" maxlength="200" placeholder="예: 현금 결제"></div>
-        <div class="act"><button class="go" id="exSubmit" type="submit">추가</button><button class="ghostbtn" id="exCancel" type="button" hidden>취소</button><span class="formmsg" id="exMsg">VND는 1,000동 ≈ 54원, USD는 1달러 ≈ 1,400원으로 환산해요</span></div>
+        <div class="act"><button class="go" id="exSubmit" type="submit">추가</button><button class="ghostbtn" id="exCancel" type="button" hidden>취소</button><button class="ghostbtn" id="exClear" type="button">입력 지우기</button><span class="formmsg" id="exMsg">VND는 1,000동 ≈ 54원, USD는 1달러 ≈ 1,400원으로 환산해요</span></div>
       </form>
     </div>
 
@@ -734,7 +734,7 @@ const $=id=>document.getElementById(id);
 let editingId=null;
 function resetForm(){
   editingId=null;$('exCard').classList.remove('editing');$('exTitle').textContent='지출 추가';
-  $('exSubmit').textContent='추가';$('exCancel').hidden=true;
+  $('exSubmit').textContent='추가';$('exCancel').hidden=true;$('exClear').hidden=false;
   ['exItem','exAmt','exMemo'].forEach(i=>$(i).value='');
   $('exDate').value=new Date().toLocaleDateString('sv-SE');$('exPayer').value=me();
   $('exThumb').hidden=true;$('exPhotoMsg').textContent='사진을 찍거나 고르면 항목·금액·날짜를 자동으로 채워요. 추가 전에 한 번 확인해 주세요';
@@ -742,7 +742,7 @@ function resetForm(){
 function startEdit(id){
   const x=store.expenses.find(v=>v.id===id);if(!x)return;
   editingId=id;$('exCard').classList.add('editing');$('exTitle').textContent='지출 수정';
-  $('exSubmit').textContent='저장';$('exCancel').hidden=false;
+  $('exSubmit').textContent='저장';$('exCancel').hidden=false;$('exClear').hidden=true;
   $('exItem').value=x.item;$('exAmt').value=Number(x.amount).toLocaleString('ko-KR');$('exCur').value=x.cur;
   $('exCat').value=x.cat;$('exDate').value=x.date;$('exPayer').value=x.payer||'';$('exMemo').value=x.memo||'';
   msg.textContent='고친 뒤 저장을 눌러 주세요';
@@ -750,6 +750,7 @@ function startEdit(id){
   $('exCard').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});
 }
 $('exCancel').addEventListener('click',()=>{resetForm();msg.textContent='수정을 취소했어요';});
+$('exClear').addEventListener('click',()=>{resetForm();$('exCat').selectedIndex=0;$('exCur').value='KRW';msg.textContent='입력한 내용을 지웠어요';$('exItem').focus();});
 form.addEventListener('submit',async e=>{
   e.preventDefault();
   const item=$('exItem').value.trim();
