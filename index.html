@@ -147,6 +147,46 @@ table.cost{width:100%;border-collapse:collapse;font-size:13px;min-width:460px}
 .sum b{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:clamp(15px,4.2vw,20px)}
 .sum span{font-size:12px;color:var(--muted)}
 @media (max-width:520px){.sums{grid-template-columns:1fr}}
+.who{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:10px 14px;font-size:13px}
+.who label{color:var(--muted)}
+.inp{font:inherit;font-size:14px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:7px 10px;min-width:0;width:100%}
+.inp:focus{outline:2px solid var(--sea);outline-offset:0;border-color:var(--sea)}
+.who .inp{width:9em}
+.sync{margin-left:auto;font-size:12px;border-radius:999px;padding:3px 10px;background:var(--chip);color:var(--muted);display:inline-flex;align-items:center;gap:6px}
+.sync::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--muted)}
+.sync.ok{color:var(--sea)} .sync.ok::before{background:var(--sea)}
+.sync.err{color:var(--d4)} .sync.err::before{background:var(--d4)}
+.sync.local{color:var(--ink)} .sync.local::before{background:var(--sun)}
+.cl .by{display:block;font-size:11px;color:var(--sea);margin-top:1px}
+.exform{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.exform .f{display:grid;gap:4px;min-width:0}
+.exform .f.wide{grid-column:1/-1}
+.exform label{font-size:12px;color:var(--muted)}
+.exform .amt{display:grid;grid-template-columns:1fr auto;gap:6px}
+.exform .amt select{width:auto}
+.exform .act{grid-column:1/-1;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.go{font:inherit;font-size:14px;font-weight:700;border:0;border-radius:8px;padding:9px 18px;background:var(--sea);color:var(--paper);cursor:pointer}
+.go:disabled{opacity:.5;cursor:default}
+.formmsg{font-size:12px;color:var(--muted)}
+.bars{display:grid;gap:8px}
+.bar{display:grid;grid-template-columns:5.5em 1fr auto;gap:8px;align-items:center;font-size:13px}
+.bar .tr{height:8px;border-radius:999px;background:var(--chip);overflow:hidden}
+.bar .tr i{display:block;height:100%;background:var(--c,var(--sea));border-radius:999px}
+.bar b{font-family:var(--mono);font-variant-numeric:tabular-nums;font-weight:500;font-size:12px;white-space:nowrap}
+.bar span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.exlist{list-style:none;margin:0;padding:0;display:grid}
+.exlist li{display:grid;grid-template-columns:1fr auto;gap:2px 10px;padding:9px 0;border-bottom:1px dashed var(--line);align-items:start}
+.exlist li:last-child{border-bottom:0}
+.exlist .t{font-size:14px;font-weight:500;min-width:0;overflow-wrap:anywhere}
+.exlist .m{font-size:12px;color:var(--muted);min-width:0;overflow-wrap:anywhere}
+.exlist .a{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:14px;text-align:right;white-space:nowrap}
+.exlist .o{font-family:var(--mono);font-size:11px;color:var(--muted);text-align:right;white-space:nowrap}
+.cat{display:inline-block;font-size:11px;border-radius:999px;padding:0 7px;margin-right:4px;background:var(--chip);color:var(--ink);font-weight:500}
+.del{font:inherit;font-size:11px;border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:6px;padding:1px 7px;cursor:pointer;justify-self:end}
+.del[data-armed]{border-color:var(--d4);color:var(--d4)}
+.empty{font-size:13px;color:var(--muted);padding:6px 0}
+details.card summary{cursor:pointer;font-weight:700;font-size:15px}
+details.card[open] summary{margin-bottom:6px}
 </style>
 
 </head>
@@ -210,6 +250,12 @@ table.cost{width:100%;border-collapse:collapse;font-size:13px;min-width:460px}
 
   <section class="block" id="check">
     <div><div class="eyebrow">Checklist</div><h2>여행 체크리스트</h2></div>
+    <div class="who">
+      <label for="meName">내 이름</label>
+      <input class="inp" id="meName" maxlength="20" placeholder="예: 아빠" autocomplete="nickname">
+      <span class="formmsg">체크와 지출 기록에 이 이름이 남아요</span>
+      <span class="sync" id="sync">불러오는 중</span>
+    </div>
     <div class="cl">
       <div class="card done">
         <h3>한 일 <span class="cnt">5개</span></h3>
@@ -230,13 +276,42 @@ table.cost{width:100%;border-collapse:collapse;font-size:13px;min-width:460px}
   </section>
 
   <section class="block" id="cost">
-    <div><div class="eyebrow">Budget</div><h2>비용 정리</h2></div>
+    <div><div class="eyebrow">Budget</div><h2>비용 정산</h2></div>
     <div class="sums">
-      <div class="sum"><span>결제 완료</span><b>2,114,629원</b></div>
-      <div class="sum"><span>현지 예상 비용</span><b>약 110~144만원</b></div>
-      <div class="sum"><span>전체 예상</span><b>약 321~355만원</b></div>
+      <div class="sum"><span>지금까지 쓴 돈</span><b id="sumSpent">-</b></div>
+      <div class="sum"><span>예상 총비용</span><b>약 321~355만원</b></div>
+      <div class="sum"><span>예상 상한 대비 남은 돈</span><b id="sumLeft">-</b></div>
     </div>
-    <div class="tblwrap">
+
+    <div class="card">
+      <h3>지출 추가</h3>
+      <form id="exForm" class="exform" novalidate>
+        <div class="f wide"><label for="exItem">항목</label><input class="inp" id="exItem" maxlength="100" placeholder="예: 빈원더스 입장권 4인" required></div>
+        <div class="f"><label for="exAmt">금액</label>
+          <div class="amt"><input class="inp" id="exAmt" inputmode="decimal" placeholder="0" required>
+          <select class="inp" id="exCur" aria-label="통화"><option>KRW</option><option>VND</option><option>USD</option></select></div></div>
+        <div class="f"><label for="exCat">분류</label><select class="inp" id="exCat">
+          <option>식비</option><option>교통</option><option>입장권</option><option>쇼핑</option><option>스파</option><option>숙소</option><option>항공</option><option>기타</option></select></div>
+        <div class="f"><label for="exDate">날짜</label><input class="inp" type="date" id="exDate" min="2026-10-01" max="2026-12-31"></div>
+        <div class="f"><label for="exPayer">낸 사람</label><input class="inp" id="exPayer" maxlength="30" list="payers" placeholder="이름"><datalist id="payers"></datalist></div>
+        <div class="f wide"><label for="exMemo">메모 (선택)</label><input class="inp" id="exMemo" maxlength="200" placeholder="예: 현금 결제"></div>
+        <div class="act"><button class="go" id="exSubmit" type="submit">추가</button><span class="formmsg" id="exMsg">VND는 1,000동 ≈ 54원, USD는 1달러 ≈ 1,400원으로 환산해요</span></div>
+      </form>
+    </div>
+
+    <div class="bk">
+      <div class="card"><h3>분류별</h3><div class="bars" id="byCat"></div></div>
+      <div class="card"><h3>낸 사람별</h3><div class="bars" id="byPayer"></div></div>
+    </div>
+
+    <div class="card">
+      <h3>지출 내역 <span class="cnt" id="exCnt"></span></h3>
+      <ul class="exlist" id="exList"></ul>
+    </div>
+
+    <details class="card">
+      <summary>출발 전 예상 비용 표</summary>
+      <div class="tblwrap">
       <table class="cost">
         <thead><tr><th>항목</th><th>상태</th><th class="n">금액(원)</th></tr></thead>
         <tbody>
@@ -257,7 +332,8 @@ table.cost{width:100%;border-collapse:collapse;font-size:13px;min-width:460px}
         </tbody>
       </table>
     </div>
-    <p class="mapnote">예상 비용은 1,000동 ≈ 54원으로 계산했어요. 입장권은 키 기준(1m 미만 무료, 1~1.4m 아동가)이라 아이들 키에 따라 달라져요. 쇼핑·기념품은 빠져 있어요.</p>
+      <p class="mapnote">1,000동 ≈ 54원 기준. 입장권은 키 기준(1m 미만 무료, 1~1.4m 아동가)이라 아이들 키에 따라 달라져요. 쇼핑·기념품은 빠져 있어요.</p>
+    </details>
   </section>
 
   <section class="overview" id="map">
@@ -509,7 +585,11 @@ function pick(id){
 tabs.forEach(([t])=>document.getElementById(t).addEventListener('click',()=>pick(t)));
 try{const s=localStorage.getItem('pq-opt');if(s)pick(s)}catch(e){}
 
-/* ---------- checklist ---------- */
+/* ---------- shared store (checklist + expenses) ---------- */
+// 구글 Apps Script 웹 앱 URL(…/exec)을 넣으면 가족이 함께 체크·기록해요. 비워 두면 이 기기에만 저장돼요.
+const API_URL='https://script.google.com/macros/s/AKfycbyR_rFx0NCN4NQqULiZhu7qgcUyjx-rxQ9ARZI1l09zy6x3r0OjlMP2JNMNaz5gmZ5h/exec';
+const RATE={KRW:1,VND:0.054,USD:1400};
+const BUDGET_MAX=3550000;
 const TODO=[
  ["passport","여권 유효기간 확인 (4명)","입국일 기준 6개월 이상 남아야 해요. 아이들 여권도 확인"],
  ["family-cert","영문 가족관계증명서 준비","아이들과 함께 갈 때 챙기면 좋아요. 정부24에서 발급"],
@@ -527,15 +607,127 @@ const TODO=[
  ["kids","아이 준비물","수영복·래시가드, 선크림, 모기 기피제, 상비약, 유모차"],
  ["home","12/1(화) 귀가 교통·일정 확인","06:35 인천 도착 · 출근·등교 일정 조정"]
 ];
+const SEED=[
+ {id:"seed-flight",date:"2026-11-05",item:"항공권 · 제주항공 4인",cat:"항공",amount:1240400,cur:"KRW",payer:"",memo:"결제 완료",createdAt:"2026-11-05T00:00:00Z"},
+ {id:"seed-hotel",date:"2026-11-05",item:"호텔 · 빈펄 리조트 3박 조식 포함",cat:"숙소",amount:874229,cur:"KRW",payer:"",memo:"결제 완료",createdAt:"2026-11-05T00:00:01Z"}
+];
+const CATC={항공:"--d3",숙소:"--d2",교통:"--sea",식비:"--d4",입장권:"--d1",쇼핑:"--sun",스파:"--d4b",기타:"--muted"};
+const ls=(k,v)=>{try{if(v===undefined)return JSON.parse(localStorage.getItem(k)||'null');localStorage.setItem(k,JSON.stringify(v));}catch(e){return null;}};
+const won=n=>Math.round(n).toLocaleString('ko-KR');
+const krw=x=>(Number(x.amount)||0)*(RATE[x.cur]||1);
+const store={checks:{},expenses:[]};
+let pending=0;
+
+/* local fallback, carrying over checks saved before sharing existed */
+function loadLocal(){
+  let l=ls('pq-local');
+  if(!l){l={checks:{},expenses:SEED.slice()};const old=ls('pq-todo')||{};
+    Object.keys(old).forEach(k=>{if(old[k])l.checks[k]={done:true,by:'',at:''};});}
+  store.checks=l.checks||{};store.expenses=l.expenses||[];
+}
+function saveLocal(){if(!API_URL)ls('pq-local',{checks:store.checks,expenses:store.expenses});}
+
+const syncEl=document.getElementById('sync');
+function setSync(state,msg){syncEl.className='sync '+state;syncEl.textContent=msg;}
+
+async function pull(){
+  if(!API_URL||pending)return;
+  try{const r=await fetch(API_URL+'?t='+Date.now());const d=await r.json();
+    if(!d.ok)throw new Error(d.error);
+    if(pending)return;
+    store.checks=d.checks||{};store.expenses=d.expenses||[];
+    setSync('ok','함께 쓰는 중 · '+new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'})+' 동기화');
+    renderAll();
+  }catch(e){setSync('err','동기화 실패 · 잠시 후 다시 시도해요');}
+}
+async function push(body){
+  saveLocal();
+  if(!API_URL)return true;
+  pending++;setSync('','저장 중');
+  try{const r=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(body)});
+    const d=await r.json();if(!d.ok)throw new Error(d.error);return true;
+  }catch(e){setSync('err','저장 실패 · '+(e.message||'네트워크 확인'));return false;}
+  finally{pending--;if(!pending)pull();}
+}
+
+/* who am I */
+const meEl=document.getElementById('meName');
+meEl.value=ls('pq-me')||'';
+const me=()=>meEl.value.trim();
+meEl.addEventListener('change',()=>{ls('pq-me',me());const p=document.getElementById('exPayer');if(!p.value)p.value=me();});
+
+/* checklist */
 const tdl=document.getElementById('todo');
-let saved={};try{saved=JSON.parse(localStorage.getItem('pq-todo')||'{}')}catch(e){}
-tdl.innerHTML=TODO.map(([id,t,d])=>`<li><label for="t-${id}"><input type="checkbox" id="t-${id}" data-id="${id}" ${saved[id]?'checked':''}><span>${t}${d?`<small>${d}</small>`:''}</span></label></li>`).join('');
-function upd(){const all=tdl.querySelectorAll('input'),n=[...all].filter(i=>i.checked).length;
-  document.getElementById('todoCnt').textContent=`${n} / ${all.length}`;
-  document.getElementById('todoBar').style.width=(n/all.length*100)+'%';}
-tdl.addEventListener('change',e=>{const i=e.target;if(!i.dataset.id)return;saved[i.dataset.id]=i.checked;
-  try{localStorage.setItem('pq-todo',JSON.stringify(saved))}catch(err){}upd();});
-upd();
+function renderTodo(){
+  tdl.innerHTML=TODO.map(([id,t,d])=>{const c=store.checks[id]||{};
+    const by=c.done&&c.by?`<span class="by">${esc(c.by)} 체크</span>`:'';
+    return `<li><label for="t-${id}"><input type="checkbox" id="t-${id}" data-id="${id}" ${c.done?'checked':''}><span>${t}${d?`<small>${d}</small>`:''}${by}</span></label></li>`;}).join('');
+  const n=TODO.filter(([id])=>store.checks[id]&&store.checks[id].done).length;
+  document.getElementById('todoCnt').textContent=`${n} / ${TODO.length}`;
+  document.getElementById('todoBar').style.width=(n/TODO.length*100)+'%';
+}
+tdl.addEventListener('change',e=>{const i=e.target;if(!i.dataset.id)return;
+  store.checks[i.dataset.id]={done:i.checked,by:me(),at:new Date().toISOString()};
+  renderTodo();push({action:'check',id:i.dataset.id,done:i.checked,by:me()});});
+
+/* expenses */
+function bars(el,map,colorOf){
+  const rows=Object.entries(map).sort((a,b)=>b[1]-a[1]);const max=rows.length?rows[0][1]:0;
+  el.innerHTML=rows.length?rows.map(([k,v])=>`<div class="bar" style="--c:var(${colorOf(k)})"><span>${esc(k)}</span><div class="tr"><i style="width:${max?v/max*100:0}%"></i></div><b>${won(v)}</b></div>`).join(''):'<div class="empty">아직 기록이 없어요</div>';
+}
+function renderExpenses(){
+  const xs=store.expenses.slice().sort((a,b)=>(b.date+b.createdAt).localeCompare(a.date+a.createdAt));
+  const total=xs.reduce((t,x)=>t+krw(x),0);
+  document.getElementById('sumSpent').textContent=won(total)+'원';
+  const left=BUDGET_MAX-total;
+  document.getElementById('sumLeft').textContent=(left<0?'−':'')+won(Math.abs(left))+'원';
+  document.getElementById('exCnt').textContent=xs.length+'건';
+  const byCat={},byPayer={};
+  xs.forEach(x=>{byCat[x.cat]=(byCat[x.cat]||0)+krw(x);const p=x.payer||'미지정';byPayer[p]=(byPayer[p]||0)+krw(x);});
+  bars(document.getElementById('byCat'),byCat,k=>CATC[k]||'--muted');
+  bars(document.getElementById('byPayer'),byPayer,()=> '--sea');
+  document.getElementById('exList').innerHTML=xs.length?xs.map(x=>`<li>
+    <div class="t"><span class="cat">${esc(x.cat)}</span>${esc(x.item)}</div>
+    <div class="a">${won(krw(x))}원</div>
+    <div class="m">${esc(x.date.slice(5).replace('-','/'))}${x.payer?' · '+esc(x.payer):''}${x.memo?' · '+esc(x.memo):''}</div>
+    <div>${x.cur!=='KRW'?`<div class="o">${Number(x.amount).toLocaleString('ko-KR')} ${x.cur}</div>`:''}<button class="del" type="button" data-id="${esc(x.id)}">삭제</button></div>
+  </li>`).join(''):'<li class="empty">아직 기록이 없어요. 위에서 첫 지출을 추가해 보세요.</li>';
+  const names=[...new Set([me(),...xs.map(x=>x.payer)].filter(Boolean))];
+  document.getElementById('payers').innerHTML=names.map(n=>`<option value="${esc(n)}">`).join('');
+}
+document.getElementById('exList').addEventListener('click',e=>{
+  const btn=e.target.closest('.del');if(!btn)return;
+  if(!btn.dataset.armed){btn.dataset.armed='1';btn.textContent='정말 삭제';setTimeout(()=>{if(btn.isConnected){delete btn.dataset.armed;btn.textContent='삭제';}},3000);return;}
+  const id=btn.dataset.id;store.expenses=store.expenses.filter(x=>x.id!==id);renderExpenses();
+  push({action:'deleteExpense',id});
+});
+const form=document.getElementById('exForm'),msg=document.getElementById('exMsg');
+document.getElementById('exDate').value=new Date().toLocaleDateString('sv-SE');
+document.getElementById('exPayer').value=me();
+form.addEventListener('submit',async e=>{
+  e.preventDefault();
+  const item=document.getElementById('exItem').value.trim();
+  const amount=Number(document.getElementById('exAmt').value.replace(/[,\s]/g,''));
+  const date=document.getElementById('exDate').value;
+  if(!item){msg.textContent='항목을 입력해 주세요';document.getElementById('exItem').focus();return;}
+  if(!(amount>0)){msg.textContent='금액을 숫자로 입력해 주세요';document.getElementById('exAmt').focus();return;}
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(date)){msg.textContent='날짜를 골라 주세요';return;}
+  const x={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),date,item,
+    cat:document.getElementById('exCat').value,amount,cur:document.getElementById('exCur').value,
+    payer:document.getElementById('exPayer').value.trim(),memo:document.getElementById('exMemo').value.trim(),
+    createdAt:new Date().toISOString()};
+  store.expenses.push(x);renderExpenses();
+  document.getElementById('exItem').value='';document.getElementById('exAmt').value='';document.getElementById('exMemo').value='';
+  const ok=await push({action:'addExpense',expense:x});
+  msg.textContent=ok?`추가했어요 · ${x.item} ${won(krw(x))}원`:'저장하지 못했어요. 인터넷 연결을 확인하고 다시 추가해 주세요';
+});
+
+function renderAll(){renderTodo();renderExpenses();}
+loadLocal();renderAll();
+if(API_URL){setSync('','불러오는 중');pull();
+  setInterval(()=>{if(document.visibilityState==='visible')pull();},30000);
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')pull();});
+}else setSync('local','이 기기에만 저장 중');
 </script>
 
 </body>
