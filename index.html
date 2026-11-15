@@ -1312,6 +1312,13 @@ async function showViewer(){
 $('pvPrev').addEventListener('click',()=>{pvState.i=(pvState.i-1+pvState.list.length)%pvState.list.length;showViewer();});
 $('pvNext').addEventListener('click',()=>{pvState.i=(pvState.i+1)%pvState.list.length;showViewer();});
 $('photoView').addEventListener('keydown',e=>{if(e.key==='ArrowLeft')$('pvPrev').click();if(e.key==='ArrowRight')$('pvNext').click();});
+/* swipe left/right to move between photos */
+(()=>{let sx=0,sy=0,on=false;const fig=$('photoView').querySelector('figure');fig.style.touchAction='pan-y';
+  fig.addEventListener('touchstart',e=>{if(e.touches.length!==1)return;on=true;sx=e.touches[0].clientX;sy=e.touches[0].clientY;},{passive:true});
+  fig.addEventListener('touchend',e=>{if(!on)return;on=false;const t=e.changedTouches[0],dx=t.clientX-sx,dy=t.clientY-sy;
+    if(pvState.list.length<2||Math.abs(dx)<40||Math.abs(dx)<Math.abs(dy)*1.2)return;
+    (dx<0?$('pvNext'):$('pvPrev')).click();},{passive:true});
+})();
 /* lazy thumbnails anywhere: <img data-t="thumbId"> */
 function hydrateThumbs(root){root.querySelectorAll('img[data-t]').forEach(img=>{const t=img.dataset.t;if(!t||img.getAttribute('src'))return;
   if(photoCache[t]){img.src=photoCache[t];return;}photoUrl(t).then(u=>{img.src=u;}).catch(()=>{});});}
@@ -1466,7 +1473,7 @@ function renderBookings(){
       ${x.amount>0?`<dt>금액</dt><dd class="mono">${won(krw(x))}원${x.cur!=='KRW'?` (${Number(x.amount).toLocaleString('ko-KR')} ${x.cur})`:''}</dd>`:''}
       ${x.memo?`<dt>메모</dt><dd>${esc(x.memo)}</dd>`:''}
     </dl>
-    ${x.photos&&x.photos.length?`<div class="phcnt">사진 ${x.photos.length}장${x.photos.length>1?' · 눌러서 넘겨 보기':''}</div><div class="bkph">${x.photos.map((p,i)=>`<button type="button" data-bph="${esc(x.id)}" data-i="${i}" aria-label="${esc(p.label||'사진 '+(i+1))} 크게 보기"><img alt="" data-t="${esc(p.t||p.id)}">${p.label?`<span>${esc(p.label)}</span>`:''}</button>`).join('')}</div>`:''}
+    ${x.photos&&x.photos.length?`<div class="phcnt">사진 ${x.photos.length}장${x.photos.length>1?' · 눌러서 좌우로 넘겨 보기':''}</div><div class="bkph">${x.photos.map((p,i)=>`<button type="button" data-bph="${esc(x.id)}" data-i="${i}" aria-label="${esc(p.label||'사진 '+(i+1))} 크게 보기"><img alt="" data-t="${esc(p.t||p.id)}">${p.label?`<span>${esc(p.label)}</span>`:''}</button>`).join('')}</div>`:''}
     <div class="rowbtns"><button class="edit" type="button" data-id="${esc(x.id)}">수정</button><button class="del" type="button" data-id="${esc(x.id)}">삭제</button></div>
   </li>`).join(''):'<li class="empty">아직 추가한 예약이 없어요. 입장권, 픽업, 스파처럼 예약한 것을 기록해 두세요.</li>';
   if(API_URL)hydrateThumbs($('bkList'));
