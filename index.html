@@ -211,18 +211,25 @@ details.card summary{cursor:pointer;font-weight:700;font-size:15px}
 .receipt{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:center;background:var(--bg);border:1px dashed var(--line);border-radius:10px;padding:10px}
 .receipt .thumb{padding:0;border:1px solid var(--line);border-radius:8px;background:none;cursor:zoom-in;width:56px;height:56px;overflow:hidden}
 .receipt .thumb img{width:100%;height:100%;object-fit:cover;display:block}
-dialog.pv{border:0;padding:max(10px,env(safe-area-inset-top)) 0 max(10px,env(safe-area-inset-bottom));background:transparent;max-width:min(96vw,720px);max-height:none;width:100%;height:100vh;height:100dvh;margin:0 auto;box-sizing:border-box;overflow:hidden}
+dialog.pv{position:fixed;inset:0;width:100vw;max-width:none;height:100vh;height:100dvh;max-height:none;margin:0;padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px);border:0;background:#000;color:#fff;overflow:hidden;box-sizing:border-box;overscroll-behavior:contain;touch-action:none}
 dialog.pv[open]{display:flex;flex-direction:column}
 dialog.pv::backdrop{background:#000}
-dialog.pv{width:min(96vw,720px)}
-.pvview{width:100%;flex:1;min-height:0;overflow:hidden;touch-action:pan-y;user-select:none;-webkit-user-select:none}
+.pvtop{flex:none;display:flex;align-items:center;gap:4px;padding:6px 8px;min-height:44px;box-sizing:border-box}
+.pvbtn{font:inherit;font-size:22px;line-height:1;color:#fff;background:rgba(255,255,255,.12);border:0;border-radius:999px;width:36px;height:36px;display:grid;place-items:center;cursor:pointer;flex:none}
+.pvbtn:disabled{opacity:.3}
+.pvx{font-size:16px;margin-left:auto}
+#pvCount{font-family:var(--mono);font-size:13px;min-width:3.2em;text-align:center;flex:none}
+#photoCap{flex:1;min-width:0;font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 6px}
+.pvhint{flex:none;text-align:center;font-size:11px;color:rgba(255,255,255,.55);padding:4px 10px 6px}
+dialog.pv.bare .pvtop,dialog.pv.bare .pvhint{display:none}
+.pvview{flex:1;min-height:0;width:100%;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none}
 .pvtrack{display:flex;height:100%;will-change:transform}
 .pvtrack.anim{transition:transform .28s cubic-bezier(.2,.8,.2,1)}
-.pvslide{flex:0 0 100%;height:100%;min-height:0;display:grid;place-items:center;position:relative}
-.pvslide img{max-width:100%;max-height:100%;object-fit:contain;border-radius:8px;display:block;-webkit-user-drag:none}
+.pvslide{flex:0 0 100%;height:100%;min-height:0;position:relative;overflow:hidden}
+.pvslide img{width:100%;height:100%;object-fit:contain;display:block;-webkit-user-drag:none;transform-origin:50% 50%}
+.pvslide img.anim,.pvslide.anim{transition:transform .22s ease}
 .pvslide .ld{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);font-size:12px;color:#fff;background:rgba(0,0,0,.5);border-radius:999px;padding:2px 10px}
-@media (prefers-reduced-motion:reduce){.pvtrack.anim{transition:none}}
-dialog.pv .pvbar{display:flex;justify-content:center;padding-top:8px;flex:none}
+@media (prefers-reduced-motion:reduce){.pvtrack.anim,.pvslide img.anim,.pvslide.anim{transition:none}}
 .receipt .rtxt{display:grid;gap:2px;min-width:0;font-size:12px;color:var(--muted)}
 .ghostbtn{font:inherit;font-size:14px;font-weight:500;border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:8px;padding:8px 14px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;justify-self:start}
 .ghostbtn svg{width:16px;height:16px;color:var(--sun)}
@@ -322,10 +329,6 @@ dialog.pv .pvbar{display:flex;justify-content:center;padding-top:8px;flex:none}
 .bkph img{width:76px;height:76px;object-fit:cover;display:block;background:var(--chip)}
 .bkph span{font-size:11px;padding:2px 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:var(--paper)}
 .phcnt{font-size:12px;color:var(--muted)}
-dialog.pv figure{margin:0;display:flex;flex-direction:column;align-items:center;gap:8px;flex:1;min-height:0;width:100%}
-dialog.pv figcaption{flex:none;color:#fff;font-size:14px;font-weight:700;line-height:1.4;text-align:center;padding:0 12px;min-height:1em;max-height:2.8em;overflow:hidden}
-dialog.pv .pvbar{gap:8px;align-items:center}
-dialog.pv .pvbar span{color:#fff;font-size:13px;font-family:var(--mono);min-width:3.5em;text-align:center}
 .edit{font:inherit;font-size:11px;border:1px solid var(--line);background:transparent;color:var(--sea);border-radius:6px;padding:1px 7px;cursor:pointer}
 details.card[open] summary{margin-bottom:6px}
 </style>
@@ -512,7 +515,7 @@ details.card[open] summary{margin-bottom:6px}
             </div>
           </div>
           <input type="file" id="exPhoto" accept="image/*" hidden>
-          <dialog class="pv" id="photoView" aria-label="사진 보기"><figure><div class="pvview"><div class="pvtrack" id="pvTrack"></div></div><figcaption id="photoCap"></figcaption></figure><div class="pvbar"><button type="button" class="ghostbtn" id="pvPrev">이전</button><span id="pvCount"></span><button type="button" class="ghostbtn" id="pvNext">다음</button><button type="button" class="ghostbtn" id="photoClose">닫기</button></div></dialog>
+          <dialog class="pv" id="photoView" aria-label="사진 보기"><div class="pvtop"><button type="button" class="pvbtn" id="pvPrev" aria-label="이전 사진">‹</button><span id="pvCount"></span><button type="button" class="pvbtn" id="pvNext" aria-label="다음 사진">›</button><span id="photoCap"></span><button type="button" class="pvbtn pvx" id="photoClose" aria-label="닫기">✕</button></div><div class="pvview"><div class="pvtrack" id="pvTrack"></div></div><div class="pvhint" id="pvHint">두 번 탭·두 손가락 확대 · 아래로 밀면 닫기 · 탭하면 사진만</div></dialog>
         </div>
         <div class="f wide"><label for="exItem">항목</label><input class="inp" id="exItem" maxlength="100" placeholder="예: 빈원더스 입장권 4인" required></div>
         <div class="f"><label for="exAmt">금액</label>
@@ -1342,10 +1345,13 @@ function openViewer(list,i){
   /* the tapped photo and its neighbours first */
   const order=[pvState.i,pvState.i+1,pvState.i-1].filter(k=>list[k]).map(k=>list[k].id);prefetch(order,true);
   goSlide(pvState.i,false);
-  const d=$('photoView');try{d.showModal();}catch(e){d.setAttribute('open','');}
+  const d=$('photoView');d.classList.remove('bare');d.style.background='';
+  document.documentElement.style.overflow=document.body.style.overflow='hidden';
+  try{d.showModal();}catch(e){d.setAttribute('open','');}
 }
+$('photoView').addEventListener('close',()=>{document.documentElement.style.overflow=document.body.style.overflow='';});
 function goSlide(i,anim){
-  const n=pvState.list.length;pvState.i=Math.min(Math.max(0,i),n-1);
+  const n=pvState.list.length;pvState.i=Math.min(Math.max(0,i),n-1);pvZoom(1,0,0,false);
   pvTrack.classList.toggle('anim',anim!==false);pvTrack.style.transform=`translateX(${-pvState.i*100}%)`;
   const p=pvState.list[pvState.i]||{};
   $('photoCap').textContent=p.label||'';$('pvCount').textContent=n>1?`${pvState.i+1} / ${n}`:'';
@@ -1354,16 +1360,52 @@ function goSlide(i,anim){
 $('pvPrev').addEventListener('click',()=>goSlide(pvState.i-1));
 $('pvNext').addEventListener('click',()=>goSlide(pvState.i+1));
 $('photoView').addEventListener('keydown',e=>{if(e.key==='ArrowLeft')goSlide(pvState.i-1);if(e.key==='ArrowRight')goSlide(pvState.i+1);});
-/* drag: the photo follows the finger, then snaps */
-(()=>{const view=$('photoView').querySelector('.pvview');let sx=0,sy=0,dx=0,t0=0,mode=null;
-  view.addEventListener('touchstart',e=>{if(e.touches.length!==1)return;sx=e.touches[0].clientX;sy=e.touches[0].clientY;dx=0;t0=Date.now();mode=null;pvTrack.classList.remove('anim');},{passive:true});
-  view.addEventListener('touchmove',e=>{if(e.touches.length!==1)return;const mx=e.touches[0].clientX-sx,my=e.touches[0].clientY-sy;
-    if(!mode){if(Math.abs(mx)<6&&Math.abs(my)<6)return;mode=Math.abs(mx)>Math.abs(my)?'x':'y';}
-    if(mode!=='x')return;const n=pvState.list.length,edge=(pvState.i===0&&mx>0)||(pvState.i===n-1&&mx<0);
-    dx=edge?mx/3:mx;pvTrack.style.transform=`translateX(calc(${-pvState.i*100}% + ${dx}px))`;},{passive:true});
-  view.addEventListener('touchend',()=>{if(mode!=='x'){mode=null;return;}mode=null;
-    const w=view.clientWidth||1,fast=Math.abs(dx)>30&&Date.now()-t0<250;
-    goSlide(Math.abs(dx)>w*0.18||fast?pvState.i+(dx<0?1:-1):pvState.i);},{passive:true});
+/* gestures: swipe sideways = next photo, pull down = close,
+   double-tap or pinch = zoom (then one finger pans), single tap = photo only */
+const Z={s:1,x:0,y:0};
+function pvImg(){const sl=pvTrack.children[pvState.i];return sl&&sl.querySelector('img');}
+function pvZoom(s,x,y,anim){const img=pvImg();Z.s=s;
+  const v=$('photoView').querySelector('.pvview'),mx=(s-1)*v.clientWidth/2,my=(s-1)*v.clientHeight/2;
+  Z.x=Math.max(-mx,Math.min(mx,x));Z.y=Math.max(-my,Math.min(my,y));
+  pvTrack.querySelectorAll('img').forEach(im=>{if(im!==img)im.style.transform='';});
+  if(!img)return;img.classList.toggle('anim',!!anim);img.style.transform=s===1?'':`translate(${Z.x}px,${Z.y}px) scale(${s})`;}
+(()=>{const dlg=$('photoView'),view=dlg.querySelector('.pvview');
+  let sx=0,sy=0,dx=0,dy=0,t0=0,mode=null,moved=false,pinch=null,lastTap=0,tapTimer=0;
+  const rel=(x,y)=>{const r=view.getBoundingClientRect();return [x-r.left-r.width/2,y-r.top-r.height/2];};
+  const dist=t=>Math.hypot(t[0].clientX-t[1].clientX,t[0].clientY-t[1].clientY);
+  const mid=t=>rel((t[0].clientX+t[1].clientX)/2,(t[0].clientY+t[1].clientY)/2);
+  view.addEventListener('touchstart',e=>{
+    if(e.touches.length===2){pinch={d:dist(e.touches),c:mid(e.touches),s:Z.s,x:Z.x,y:Z.y};mode='pinch';moved=true;return;}
+    if(e.touches.length!==1)return;
+    sx=e.touches[0].clientX;sy=e.touches[0].clientY;dx=dy=0;t0=Date.now();mode=null;moved=false;
+    pvTrack.classList.remove('anim');},{passive:true});
+  view.addEventListener('touchmove',e=>{e.preventDefault();
+    if(mode==='pinch'&&e.touches.length===2){const s=Math.max(1,Math.min(5,pinch.s*dist(e.touches)/pinch.d)),c=mid(e.touches);
+      pvZoom(s,c[0]-(pinch.c[0]-pinch.x)*s/pinch.s,c[1]-(pinch.c[1]-pinch.y)*s/pinch.s,false);return;}
+    if(e.touches.length!==1||mode==='pinch')return;
+    const mx=e.touches[0].clientX-sx,my=e.touches[0].clientY-sy;
+    if(!mode){if(Math.abs(mx)<8&&Math.abs(my)<8)return;moved=true;
+      mode=Z.s>1?'pan':Math.abs(mx)>Math.abs(my)?'x':'y';if(mode==='pan')pinch={x:Z.x,y:Z.y};}
+    if(mode==='pan'){pvZoom(Z.s,pinch.x+mx,pinch.y+my,false);return;}
+    if(mode==='x'){const n=pvState.list.length,edge=(pvState.i===0&&mx>0)||(pvState.i===n-1&&mx<0);
+      dx=edge?mx/3:mx;pvTrack.style.transform=`translateX(calc(${-pvState.i*100}% + ${dx}px))`;return;}
+    if(mode==='y'){dy=Math.max(0,my);const sl=pvTrack.children[pvState.i];if(sl){sl.classList.remove('anim');sl.style.transform=`translateY(${dy}px) scale(${1-Math.min(dy,400)/1600})`;}
+      dlg.style.background=`rgba(0,0,0,${Math.max(.3,1-dy/400)})`;}
+  },{passive:false});
+  view.addEventListener('touchend',e=>{
+    if(mode==='pinch'){if(e.touches.length===0){if(Z.s<1.05)pvZoom(1,0,0,true);mode=null;}
+      else if(e.touches.length===1){mode='pan';sx=e.touches[0].clientX;sy=e.touches[0].clientY;pinch={x:Z.x,y:Z.y};}return;}
+    if(mode==='x'){const w=view.clientWidth||1,fast=Math.abs(dx)>30&&Date.now()-t0<250;
+      goSlide(Math.abs(dx)>w*0.18||fast?pvState.i+(dx<0?1:-1):pvState.i);}
+    else if(mode==='y'){const sl=pvTrack.children[pvState.i];
+      if(dy>130||(dy>80&&Date.now()-t0<250)){if(sl)sl.style.transform='';dlg.close();}
+      else{if(sl){sl.classList.add('anim');sl.style.transform='';}dlg.style.background='';}}
+    else if(!moved&&e.changedTouches.length){const now=Date.now(),t=e.changedTouches[0];
+      if(now-lastTap<300){clearTimeout(tapTimer);lastTap=0;
+        if(Z.s>1)pvZoom(1,0,0,true);else{const p=rel(t.clientX,t.clientY);pvZoom(2.5,-p[0]*1.5,-p[1]*1.5,true);}}
+      else{lastTap=now;tapTimer=setTimeout(()=>dlg.classList.toggle('bare'),300);}}
+    mode=null;},{passive:true});
+  view.addEventListener('dblclick',e=>{if(Z.s>1)pvZoom(1,0,0,true);else{const p=rel(e.clientX,e.clientY);pvZoom(2.5,-p[0]*1.5,-p[1]*1.5,true);}});
 })();
 /* lazy thumbnails anywhere: <img data-t="thumbId"> */
 function hydrateThumbs(root){root.querySelectorAll('img[data-t]').forEach(img=>{const t=img.dataset.t;if(!t||img.getAttribute('src'))return;
@@ -1466,7 +1508,6 @@ form.addEventListener('submit',async e=>{
 const pv=$('photoView');
 $('exThumb').addEventListener('click',()=>openViewer([{src:$('exPhotoPrev').src,label:'영수증'}],0));
 $('photoClose').addEventListener('click',()=>pv.close());
-pv.addEventListener('click',e=>{if(e.target===pv)pv.close();});
 const photoBtn=$('exPhotoBtn'),photoMsg=$('exPhotoMsg');
 photoBtn.addEventListener('click',()=>{
   if(!API_URL){photoMsg.textContent='사진 읽기는 공유 저장소에 연결된 사이트에서만 돼요';return;}
