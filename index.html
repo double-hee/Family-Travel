@@ -210,7 +210,14 @@ details.card summary{cursor:pointer;font-weight:700;font-size:15px}
 .receipt .thumb img{width:100%;height:100%;object-fit:cover;display:block}
 dialog.pv{border:0;padding:0;background:transparent;max-width:min(96vw,720px);max-height:92vh;width:100%}
 dialog.pv::backdrop{background:rgba(0,0,0,.8)}
-dialog.pv img{display:block;max-width:100%;max-height:calc(92vh - 90px);margin:0 auto;border-radius:8px;object-fit:contain}
+dialog.pv{width:min(96vw,720px)}
+.pvview{width:100%;overflow:hidden;touch-action:pan-y;user-select:none;-webkit-user-select:none}
+.pvtrack{display:flex;will-change:transform}
+.pvtrack.anim{transition:transform .28s cubic-bezier(.2,.8,.2,1)}
+.pvslide{flex:0 0 100%;height:calc(88vh - 90px);display:grid;place-items:center;position:relative}
+.pvslide img{max-width:100%;max-height:100%;object-fit:contain;border-radius:8px;display:block;-webkit-user-drag:none}
+.pvslide .ld{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);font-size:12px;color:#fff;background:rgba(0,0,0,.5);border-radius:999px;padding:2px 10px}
+@media (prefers-reduced-motion:reduce){.pvtrack.anim{transition:none}}
 dialog.pv .pvbar{display:flex;justify-content:center;padding-top:10px}
 .receipt .rtxt{display:grid;gap:2px;min-width:0;font-size:12px;color:var(--muted)}
 .ghostbtn{font:inherit;font-size:14px;font-weight:500;border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:8px;padding:8px 14px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;justify-self:start}
@@ -501,7 +508,7 @@ details.card[open] summary{margin-bottom:6px}
             </div>
           </div>
           <input type="file" id="exPhoto" accept="image/*" hidden>
-          <dialog class="pv" id="photoView" aria-label="사진 보기"><figure><img id="photoBig" alt=""><figcaption id="photoCap"></figcaption></figure><div class="pvbar"><button type="button" class="ghostbtn" id="pvPrev">이전</button><span id="pvCount"></span><button type="button" class="ghostbtn" id="pvNext">다음</button><button type="button" class="ghostbtn" id="photoClose">닫기</button></div></dialog>
+          <dialog class="pv" id="photoView" aria-label="사진 보기"><figure><div class="pvview"><div class="pvtrack" id="pvTrack"></div></div><figcaption id="photoCap"></figcaption></figure><div class="pvbar"><button type="button" class="ghostbtn" id="pvPrev">이전</button><span id="pvCount"></span><button type="button" class="ghostbtn" id="pvNext">다음</button><button type="button" class="ghostbtn" id="photoClose">닫기</button></div></dialog>
         </div>
         <div class="f wide"><label for="exItem">항목</label><input class="inp" id="exItem" maxlength="100" placeholder="예: 빈원더스 입장권 4인" required></div>
         <div class="f"><label for="exAmt">금액</label>
@@ -1276,13 +1283,19 @@ document.getElementById('exList').addEventListener('click',e=>{
 });
 
 /* ---------- photos: private Drive via Apps Script ---------- */
-const photoCache={};
-async function photoUrl(id){
-  if(photoCache[id])return photoCache[id];
-  const r=await fetch(API_URL+'?action=photo&id='+encodeURIComponent(id));const d=await r.json();
-  if(!d.ok)throw new Error(d.error||'사진을 불러오지 못했어요');
-  return photoCache[id]=`data:${d.mime};base64,${d.data}`;
+const photoCache={},photoLoading={};
+function photoUrl(id){
+  if(photoCache[id])return Promise.resolve(photoCache[id]);
+  if(photoLoading[id])return photoLoading[id];
+  return photoLoading[id]=fetch(API_URL+'?action=photo&id='+encodeURIComponent(id)).then(r=>r.json()).then(d=>{
+    if(!d.ok)throw new Error(d.error||'사진을 불러오지 못했어요');
+    return photoCache[id]=`data:${d.mime};base64,${d.data}`;}).finally(()=>{delete photoLoading[id];});
 }
+/* background prefetch so photos open instantly (2 at a time, newest request first) */
+const prefetchQ=[];let prefetchN=0;
+function prefetch(ids,front){ids.filter(id=>id&&!photoCache[id]&&prefetchQ.indexOf(id)<0).forEach(id=>front?prefetchQ.unshift(id):prefetchQ.push(id));pumpPrefetch();}
+function pumpPrefetch(){while(prefetchN<2&&prefetchQ.length){const id=prefetchQ.shift();if(photoCache[id])continue;prefetchN++;
+  photoUrl(id).catch(()=>{}).finally(()=>{prefetchN--;pumpPrefetch();});}}
 function shrinkTo(src,max,q){return new Promise((res,rej)=>{
   const isFile=typeof src!=='string',url=isFile?URL.createObjectURL(src):src,img=new Image();
   img.onload=()=>{const k=Math.min(1,max/Math.max(img.width,img.height));
@@ -1299,25 +1312,39 @@ function dropPhoto(p){[p.id,p.t].filter(Boolean).forEach(id=>fetch(API_URL,{meth
 /* gallery viewer — lives at the top level so it shows from any tab */
 document.body.append($('photoView'));
 const pvState={list:[],i:0};
-function openViewer(list,i){pvState.list=list;pvState.i=i||0;showViewer();const d=$('photoView');try{d.showModal();}catch(e){d.setAttribute('open','');}}
-async function showViewer(){
-  const p=pvState.list[pvState.i];if(!p)return;const img=$('photoBig');
-  $('photoCap').textContent=p.label||'';$('pvCount').textContent=pvState.list.length>1?`${pvState.i+1} / ${pvState.list.length}`:'';
-  $('pvPrev').hidden=$('pvNext').hidden=pvState.list.length<2;
-  img.alt=p.label||'사진';
-  if(p.src){img.src=p.src;return;}
-  img.removeAttribute('src');if(p.t&&photoCache[p.t])img.src=photoCache[p.t];
-  try{const u=await photoUrl(p.id);if(pvState.list[pvState.i]===p)img.src=u;}catch(e){$('photoCap').textContent='사진을 불러오지 못했어요';}
+const pvTrack=$('pvTrack');
+function slideSrc(p){return p.src||photoCache[p.id]||(p.t&&photoCache[p.t])||'';}
+function openViewer(list,i){
+  pvState.list=list;pvState.i=Math.min(Math.max(0,i||0),list.length-1);
+  pvTrack.innerHTML=list.map((p,k)=>`<div class="pvslide" data-k="${k}"><img alt="${esc(p.label||'사진 '+(k+1))}" ${slideSrc(p)?`src="${slideSrc(p)}"`:''}>${!p.src&&!photoCache[p.id]?'<span class="ld">불러오는 중</span>':''}</div>`).join('');
+  list.forEach((p,k)=>{if(p.src||photoCache[p.id])return;
+    photoUrl(p.id).then(u=>{const sl=pvTrack.querySelector(`[data-k="${k}"]`);if(!sl||pvState.list!==list)return;sl.querySelector('img').src=u;const ld=sl.querySelector('.ld');if(ld)ld.remove();})
+      .catch(()=>{const sl=pvTrack.querySelector(`[data-k="${k}"] .ld`);if(sl)sl.textContent='불러오지 못했어요';});});
+  /* the tapped photo and its neighbours first */
+  const order=[pvState.i,pvState.i+1,pvState.i-1].filter(k=>list[k]).map(k=>list[k].id);prefetch(order,true);
+  goSlide(pvState.i,false);
+  const d=$('photoView');try{d.showModal();}catch(e){d.setAttribute('open','');}
 }
-$('pvPrev').addEventListener('click',()=>{pvState.i=(pvState.i-1+pvState.list.length)%pvState.list.length;showViewer();});
-$('pvNext').addEventListener('click',()=>{pvState.i=(pvState.i+1)%pvState.list.length;showViewer();});
-$('photoView').addEventListener('keydown',e=>{if(e.key==='ArrowLeft')$('pvPrev').click();if(e.key==='ArrowRight')$('pvNext').click();});
-/* swipe left/right to move between photos */
-(()=>{let sx=0,sy=0,on=false;const fig=$('photoView').querySelector('figure');fig.style.touchAction='pan-y';
-  fig.addEventListener('touchstart',e=>{if(e.touches.length!==1)return;on=true;sx=e.touches[0].clientX;sy=e.touches[0].clientY;},{passive:true});
-  fig.addEventListener('touchend',e=>{if(!on)return;on=false;const t=e.changedTouches[0],dx=t.clientX-sx,dy=t.clientY-sy;
-    if(pvState.list.length<2||Math.abs(dx)<40||Math.abs(dx)<Math.abs(dy)*1.2)return;
-    (dx<0?$('pvNext'):$('pvPrev')).click();},{passive:true});
+function goSlide(i,anim){
+  const n=pvState.list.length;pvState.i=Math.min(Math.max(0,i),n-1);
+  pvTrack.classList.toggle('anim',anim!==false);pvTrack.style.transform=`translateX(${-pvState.i*100}%)`;
+  const p=pvState.list[pvState.i]||{};
+  $('photoCap').textContent=p.label||'';$('pvCount').textContent=n>1?`${pvState.i+1} / ${n}`:'';
+  $('pvPrev').hidden=$('pvNext').hidden=n<2;$('pvPrev').disabled=pvState.i===0;$('pvNext').disabled=pvState.i===n-1;
+}
+$('pvPrev').addEventListener('click',()=>goSlide(pvState.i-1));
+$('pvNext').addEventListener('click',()=>goSlide(pvState.i+1));
+$('photoView').addEventListener('keydown',e=>{if(e.key==='ArrowLeft')goSlide(pvState.i-1);if(e.key==='ArrowRight')goSlide(pvState.i+1);});
+/* drag: the photo follows the finger, then snaps */
+(()=>{const view=$('photoView').querySelector('.pvview');let sx=0,sy=0,dx=0,t0=0,mode=null;
+  view.addEventListener('touchstart',e=>{if(e.touches.length!==1)return;sx=e.touches[0].clientX;sy=e.touches[0].clientY;dx=0;t0=Date.now();mode=null;pvTrack.classList.remove('anim');},{passive:true});
+  view.addEventListener('touchmove',e=>{if(e.touches.length!==1)return;const mx=e.touches[0].clientX-sx,my=e.touches[0].clientY-sy;
+    if(!mode){if(Math.abs(mx)<6&&Math.abs(my)<6)return;mode=Math.abs(mx)>Math.abs(my)?'x':'y';}
+    if(mode!=='x')return;const n=pvState.list.length,edge=(pvState.i===0&&mx>0)||(pvState.i===n-1&&mx<0);
+    dx=edge?mx/3:mx;pvTrack.style.transform=`translateX(calc(${-pvState.i*100}% + ${dx}px))`;},{passive:true});
+  view.addEventListener('touchend',()=>{if(mode!=='x'){mode=null;return;}mode=null;
+    const w=view.clientWidth||1,fast=Math.abs(dx)>30&&Date.now()-t0<250;
+    goSlide(Math.abs(dx)>w*0.18||fast?pvState.i+(dx<0?1:-1):pvState.i);},{passive:true});
 })();
 /* lazy thumbnails anywhere: <img data-t="thumbId"> */
 function hydrateThumbs(root){root.querySelectorAll('img[data-t]').forEach(img=>{const t=img.dataset.t;if(!t||img.getAttribute('src'))return;
@@ -1476,7 +1503,7 @@ function renderBookings(){
     ${x.photos&&x.photos.length?`<div class="phcnt">사진 ${x.photos.length}장${x.photos.length>1?' · 눌러서 좌우로 넘겨 보기':''}</div><div class="bkph">${x.photos.map((p,i)=>`<button type="button" data-bph="${esc(x.id)}" data-i="${i}" aria-label="${esc(p.label||'사진 '+(i+1))} 크게 보기"><img alt="" data-t="${esc(p.t||p.id)}">${p.label?`<span>${esc(p.label)}</span>`:''}</button>`).join('')}</div>`:''}
     <div class="rowbtns"><button class="edit" type="button" data-id="${esc(x.id)}">수정</button><button class="del" type="button" data-id="${esc(x.id)}">삭제</button></div>
   </li>`).join(''):'<li class="empty">아직 추가한 예약이 없어요. 입장권, 픽업, 스파처럼 예약한 것을 기록해 두세요.</li>';
-  if(API_URL)hydrateThumbs($('bkList'));
+  if(API_URL){hydrateThumbs($('bkList'));prefetch(xs.flatMap(x=>(x.photos||[]).map(p=>p.id)));}
 }
 function bkReset(){
   editingBk=null;$('bkHead').textContent='예약 추가';$('bkSubmit').textContent='추가';$('bkExpWrap').hidden=false;
