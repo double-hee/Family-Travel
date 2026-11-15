@@ -2,11 +2,14 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
+<link rel="preconnect" href="https://script.google.com">
+<link rel="preconnect" href="https://script.googleusercontent.com" crossorigin>
+<script>window.__boot=fetch("https://script.google.com/macros/s/AKfycbyR_rFx0NCN4NQqULiZhu7qgcUyjx-rxQ9ARZI1l09zy6x3r0OjlMP2JNMNaz5gmZ5h/exec?t="+Date.now()).then(function(r){return r.json()});</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>푸꾸옥 가족여행 3박 4일</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=IBM+Plex+Sans+KR:wght@400;500;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<link rel="stylesheet" media="print" onload="this.media='all'" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=IBM+Plex+Sans+KR:wght@400;500;700&family=IBM+Plex+Mono:wght@500&display=swap">
 <style>
 /* Layout: boarding-pass header, island route map, then a vertical timeline per day with map + photo links */
 :root{
@@ -1123,17 +1126,23 @@ function loadLocal(){
     Object.keys(old).forEach(k=>{if(old[k])l.checks[k]={done:true,by:'',at:''};});}
   store.checks=l.checks||{};store.expenses=l.expenses||[];store.bookings=l.bookings||[];store.plan=l.plan||{};
 }
-function saveLocal(){if(!API_URL)ls('pq-local',{checks:store.checks,expenses:store.expenses,bookings:store.bookings,plan:store.plan});}
+function saveLocal(){ls(API_URL?'pq-cache':'pq-local',{checks:store.checks,expenses:store.expenses,bookings:store.bookings,plan:store.plan});}
+/* shared mode: show the last synced copy right away while fresh data loads */
+function loadCache(){const c=ls('pq-cache');if(!c)return false;
+  store.checks=c.checks||{};store.expenses=c.expenses||[];store.bookings=c.bookings||[];store.plan=c.plan||{};return true;}
 
 const syncEl=document.getElementById('sync');
 function setSync(state,msg){syncEl.className='sync '+state;syncEl.textContent=msg;}
 
 async function pull(){
   if(!API_URL||pending)return;
-  try{const r=await fetch(API_URL+'?t='+Date.now());const d=await r.json();
+  try{let d=null;
+    if(window.__boot){const b=window.__boot;window.__boot=null;d=await b.catch(()=>null);}
+    if(!d||!d.ok){const r=await fetch(API_URL+'?t='+Date.now());d=await r.json();}
     if(!d.ok)throw new Error(d.error);
     if(pending)return;
     store.checks=d.checks||{};store.expenses=d.expenses||[];store.bookings=d.bookings||[];store.plan=d.plan||{};
+    saveLocal();warmPhotos();
     setSync('ok','함께 쓰는 중 · '+new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'})+' 동기화');
     renderAll();
   }catch(e){setSync('err','동기화 실패 · 잠시 후 다시 시도해요');}
@@ -1284,17 +1293,26 @@ document.getElementById('exList').addEventListener('click',e=>{
 
 /* ---------- photos: private Drive via Apps Script ---------- */
 const photoCache={},photoLoading={};
+/* photos never change once uploaded, so keep them on this device (IndexedDB) */
+const pdb=new Promise(res=>{try{const q=indexedDB.open('pq-photos',1);q.onupgradeneeded=()=>q.result.createObjectStore('p');
+  q.onsuccess=()=>res(q.result);q.onerror=()=>res(null);}catch(e){res(null);}});
+function idbGet(id){return pdb.then(db=>db&&new Promise(res=>{try{const q=db.transaction('p').objectStore('p').get(id);q.onsuccess=()=>res(q.result||null);q.onerror=()=>res(null);}catch(e){res(null);}}));}
+function idbPut(id,v){pdb.then(db=>{try{db&&db.transaction('p','readwrite').objectStore('p').put(v,id);}catch(e){}});}
 function photoUrl(id){
   if(photoCache[id])return Promise.resolve(photoCache[id]);
   if(photoLoading[id])return photoLoading[id];
-  return photoLoading[id]=fetch(API_URL+'?action=photo&id='+encodeURIComponent(id)).then(r=>r.json()).then(d=>{
+  return photoLoading[id]=idbGet(id).then(v=>v||fetch(API_URL+'?action=photo&id='+encodeURIComponent(id)).then(r=>r.json()).then(d=>{
     if(!d.ok)throw new Error(d.error||'사진을 불러오지 못했어요');
-    return photoCache[id]=`data:${d.mime};base64,${d.data}`;}).finally(()=>{delete photoLoading[id];});
+    const u=`data:${d.mime};base64,${d.data}`;idbPut(id,u);return u;}))
+    .then(u=>photoCache[id]=u).finally(()=>{delete photoLoading[id];});
 }
-/* background prefetch so photos open instantly (2 at a time, newest request first) */
+/* right after data arrives: thumbnails first, then full photos, for every booking and expense */
+function warmPhotos(){if(!API_URL)return;const all=[...store.bookings,...store.expenses].flatMap(x=>x.photos||[]);
+  prefetch(all.map(p=>p.t));prefetch(all.map(p=>p.id));}
+/* background prefetch so photos open instantly (4 at a time, newest request first) */
 const prefetchQ=[];let prefetchN=0;
 function prefetch(ids,front){ids.filter(id=>id&&!photoCache[id]&&prefetchQ.indexOf(id)<0).forEach(id=>front?prefetchQ.unshift(id):prefetchQ.push(id));pumpPrefetch();}
-function pumpPrefetch(){while(prefetchN<2&&prefetchQ.length){const id=prefetchQ.shift();if(photoCache[id])continue;prefetchN++;
+function pumpPrefetch(){while(prefetchN<4&&prefetchQ.length){const id=prefetchQ.shift();if(photoCache[id])continue;prefetchN++;
   photoUrl(id).catch(()=>{}).finally(()=>{prefetchN--;pumpPrefetch();});}}
 function shrinkTo(src,max,q){return new Promise((res,rej)=>{
   const isFile=typeof src!=='string',url=isFile?URL.createObjectURL(src):src,img=new Image();
@@ -1583,8 +1601,8 @@ $('bkPhoto').addEventListener('change',async e=>{
 });
 
 function renderAll(){renderTodo();renderExpenses();renderBookings();renderPlan();}
-loadLocal();renderAll();
-if(API_URL){setSync('','불러오는 중');pull();
+if(API_URL&&loadCache()){renderAll();warmPhotos();}else{loadLocal();renderAll();}
+if(API_URL){setSync('','최신 내용 불러오는 중');pull();
   setInterval(()=>{if(document.visibilityState==='visible')pull();},30000);
   document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')pull();});
 }else setSync('local','이 기기에만 저장 중');
