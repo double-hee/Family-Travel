@@ -246,6 +246,11 @@ dialog.pv.bare .pvtop,dialog.pv.bare .pvhint{display:none}
 .stop .chg{font:inherit;font-size:11px;border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:6px;padding:1px 8px;cursor:pointer;margin-left:6px;vertical-align:2px}
 .stop .chg:hover{color:var(--sea);border-color:var(--sea)}
 .stop .badge-new{font-size:10px;background:var(--sun);color:var(--paper);border-radius:999px;padding:0 6px;margin-left:6px;vertical-align:2px}
+.stop .mbtn{font:inherit;font-size:11px;border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:6px;padding:1px 8px;cursor:pointer;margin-left:6px;vertical-align:2px}
+.stop .mbtn:hover{color:var(--sea);border-color:var(--sea)}
+.memo{display:block;width:100%;box-sizing:border-box;text-align:left;font:inherit;font-size:13px;line-height:1.5;color:var(--ink);background:color-mix(in srgb,var(--sun) 14%,var(--paper));border:1px solid color-mix(in srgb,var(--sun) 45%,var(--line));border-radius:8px;padding:6px 10px;margin-top:6px;white-space:pre-wrap;word-break:break-word;cursor:pointer}
+.memo small{display:block;font-size:11px;color:var(--muted);margin-top:2px}
+.memoed textarea{flex-basis:100%;min-height:72px;resize:vertical;font:inherit;font-size:14px;line-height:1.5;box-sizing:border-box}
 .picker{display:flex;flex-wrap:wrap;gap:6px;align-items:center;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px;margin-top:8px}
 .picker select,.picker input{width:auto;font-size:13px;padding:6px 8px}
 .picker .go{padding:6px 12px;font-size:13px}
@@ -875,8 +880,11 @@ function stopHtml(e){
       <a class="btn pic" target="_blank" rel="noopener" href="https://www.google.com/search?tbm=isch&q=${gq(q)}">${ico.pic}사진</a></div>`:'';
   const chg=e.place&&e.place!=='airport'&&e.place!=='hotel'||e.added?`<button type="button" class="chg" data-pe="${esc(e.id)}">변경</button>`:'';
   const tip=e.tip||(e.added&&p?p.info:'');
+  const m=(store.memos||{})[e.id],mt=m&&m.memo;
+  const mbtn=mt?'':`<button type="button" class="mbtn" data-memo="${esc(e.id)}">메모</button>`;
+  const memo=mt?`<button type="button" class="memo" data-memo="${esc(e.id)}" aria-label="메모 수정">${esc(mt)}<small>${m.by?esc(m.by)+' · ':''}눌러서 수정</small></button>`:'';
   return `<li class="stop" data-id="${esc(e.id)}"><div class="time">${esc(e.time)}</div><div class="body">
-      <h3>${esc(e.title)}${e.added?'<span class="badge-new">추천에서 추가</span>':''}${chg}</h3>${e.desc?`<p>${esc(e.desc)}</p>`:''}${tip?`<span class="tip">${esc(tip)}</span>`:''}${links}<div class="pslot"></div></div></li>`;
+      <h3>${esc(e.title)}${e.added?'<span class="badge-new">추천에서 추가</span>':''}${chg}${mbtn}</h3>${e.desc?`<p>${esc(e.desc)}</p>`:''}${tip?`<span class="tip">${esc(tip)}</span>`:''}${memo}${links}<div class="pslot"></div></div></li>`;
 }
 function moveHtml(m,gap){if(!m)return '';const warn=m.mins&&gap!=null&&m.mins>gap?`<span class="warn">앞 일정과 ${gap}분 차이라 시간이 부족해요</span>`:'';
   return `<li class="move" aria-label="이동"><div></div><div class="mv"><b>${esc(m.mode)}</b>${esc(m.text)}${warn}</div></li>`;}
@@ -1056,9 +1064,31 @@ function syncTodos(placeId,adding){
     }});
   renderTodo();
 }
+/* per-stop memo */
+function openMemo(slot,id){
+  document.querySelectorAll('.picker').forEach(p=>p.remove());
+  const cur=((store.memos||{})[id]||{}).memo||'';planEditing='memo:'+id;
+  slot.innerHTML=`<div class="picker memoed" role="group" aria-label="메모">
+    <textarea class="inp" maxlength="1000" placeholder="예: 예약번호, 준비물, 주의할 점">${esc(cur)}</textarea>
+    <button type="button" class="go" data-mm="save">저장</button>
+    ${cur?'<button type="button" class="ghostbtn" data-mm="del">메모 지우기</button>':''}
+    <button type="button" class="ghostbtn" data-mm="cancel">취소</button></div>`;
+  const pk=slot.querySelector('.picker'),ta=pk.querySelector('textarea');
+  ta.focus();ta.setSelectionRange(ta.value.length,ta.value.length);
+  pk.addEventListener('click',ev=>{const b=ev.target.closest('[data-mm]');if(!b)return;const act=b.dataset.mm;
+    if(act==='cancel'){planEditing=null;renderPlan();return;}
+    if(act==='del'&&!b.dataset.armed){b.dataset.armed='1';b.textContent='정말 지우기';setTimeout(()=>{if(b.isConnected){delete b.dataset.armed;b.textContent='메모 지우기';}},3000);return;}
+    saveMemo(id,act==='del'?'':ta.value.trim());});
+}
+function saveMemo(id,text){
+  if(text)store.memos[id]={memo:text,by:me(),at:now()};else delete store.memos[id];
+  planEditing=null;renderPlan();flashPlan(text?'메모를 저장했어요':'메모를 지웠어요');
+  push({action:'saveMemo',id,memo:text,by:me()});
+}
 let flashTimer=null;
 function flashPlan(msg){const n=document.getElementById('planNote');if(!n)return;n.textContent=msg;n.hidden=false;clearTimeout(flashTimer);flashTimer=setTimeout(()=>{n.hidden=true;},4000);}
 document.addEventListener('click',ev=>{
+  const mm=ev.target.closest('[data-memo]');if(mm){openMemo(mm.closest('.stop').querySelector('.pslot'),mm.dataset.memo);return;}
   const ch=ev.target.closest('[data-pe]');if(ch){const host=ch.closest('.stop,.pc');openPicker(host.querySelector('.pslot'),{entryId:ch.dataset.pe});return;}
   const ad=ev.target.closest('[data-add]');if(ad){openPicker(ad.closest('.pc').querySelector('.pslot'),{place:ad.dataset.add});}
 });
@@ -1120,7 +1150,7 @@ const $=id=>document.getElementById(id);
 const ls=(k,v)=>{try{if(v===undefined)return JSON.parse(localStorage.getItem(k)||'null');localStorage.setItem(k,JSON.stringify(v));}catch(e){return null;}};
 const won=n=>Math.round(n).toLocaleString('ko-KR');
 const krw=x=>(Number(x.amount)||0)*(RATE[x.cur]||1);
-const store={checks:{},expenses:[],bookings:[],plan:{}};
+const store={checks:{},expenses:[],bookings:[],plan:{},memos:{}};
 let pending=0;
 
 /* local fallback, carrying over checks saved before sharing existed */
@@ -1128,12 +1158,12 @@ function loadLocal(){
   let l=ls('pq-local');
   if(!l){l={checks:{},expenses:SEED.slice(),bookings:[]};const old=ls('pq-todo')||{};
     Object.keys(old).forEach(k=>{if(old[k])l.checks[k]={done:true,by:'',at:''};});}
-  store.checks=l.checks||{};store.expenses=l.expenses||[];store.bookings=l.bookings||[];store.plan=l.plan||{};
+  store.checks=l.checks||{};store.expenses=l.expenses||[];store.bookings=l.bookings||[];store.plan=l.plan||{};store.memos=l.memos||{};
 }
-function saveLocal(){ls(API_URL?'pq-cache':'pq-local',{checks:store.checks,expenses:store.expenses,bookings:store.bookings,plan:store.plan});}
+function saveLocal(){ls(API_URL?'pq-cache':'pq-local',{checks:store.checks,expenses:store.expenses,bookings:store.bookings,plan:store.plan,memos:store.memos});}
 /* shared mode: show the last synced copy right away while fresh data loads */
 function loadCache(){const c=ls('pq-cache');if(!c)return false;
-  store.checks=c.checks||{};store.expenses=c.expenses||[];store.bookings=c.bookings||[];store.plan=c.plan||{};return true;}
+  store.checks=c.checks||{};store.expenses=c.expenses||[];store.bookings=c.bookings||[];store.plan=c.plan||{};store.memos=c.memos||{};return true;}
 
 const syncEl=document.getElementById('sync');
 function setSync(state,msg){syncEl.className='sync '+state;syncEl.textContent=msg;}
@@ -1145,7 +1175,7 @@ async function pull(){
     if(!d||!d.ok){const r=await fetch(API_URL+'?t='+Date.now());d=await r.json();}
     if(!d.ok)throw new Error(d.error);
     if(pending)return;
-    store.checks=d.checks||{};store.expenses=d.expenses||[];store.bookings=d.bookings||[];store.plan=d.plan||{};
+    store.checks=d.checks||{};store.expenses=d.expenses||[];store.bookings=d.bookings||[];store.plan=d.plan||{};if('memos' in d)store.memos=d.memos||{};
     saveLocal();warmPhotos();
     setSync('ok','함께 쓰는 중 · '+new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'})+' 동기화');
     renderAll();
