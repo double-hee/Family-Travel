@@ -398,7 +398,7 @@ details.card[open] summary{margin-bottom:6px}
     <div class="dayhead">
       <span class="no">DAY 4 · 11/30</span>
       <h2>체크아웃 · 사파리 · 즈엉동</h2>
-      <span class="meta">오전엔 셔틀로 사파리, 점심 후 Grab으로 오션스파에 짐을 맡기고 걸어서 킹콩마트 → 끄록스 → 메오키친 저녁 → 마사지·샤워 후 스파 차량으로 공항</span>
+      <span class="meta">오전엔 셔틀로 사파리, 점심 후 Grab으로 서울이발관에 짐을 맡기고 걸어서 킹콩마트 → 끄록스 → 메오키친 저녁 → 90분 코스·샤워 후 서울이발관 차량으로 공항</span>
       <a class="btn primary routebtn" data-route="d4" target="_blank" rel="noopener">하루 동선 지도로 보기</a>
     </div>
 
@@ -550,7 +550,7 @@ details.card[open] summary{margin-bottom:6px}
           <tr><td>입장권 · 빈원더스 앱 결제<br><small>2일 콤보 + 버기카(사파리·빈원더스·테디베어·간식) 691만 동 · 사파리 패스트트랙 + 그랜드월드 보트·베트남의 정수 공연 275만 5천 동</small></td><td><span class="tag p">결제</span></td><td class="n">514,044</td></tr>
           <tr><td>공항 픽업 · Grab 이동</td><td><span class="tag e">예상</span></td><td class="n">80,000~120,000</td></tr>
           <tr><td>식비 · 간식 (점심·저녁 약 6끼)</td><td><span class="tag e">예상</span></td><td class="n">250,000~400,000</td></tr>
-          <tr><td>오션스파 90분 4인 · 샤워<br><small>아로마 77만 동 × 3 + 키즈 65만 동 + 팁 · 약 320만 동 (후기 쓰면 20% 할인)</small></td><td><span class="tag e">예상</span></td><td class="n">150,000~180,000</td></tr>
+          <tr><td>서울이발관 90분 4인 · 샤워 · 공항 샌딩<br><small>가격 미확인 · 예약 때 확인</small></td><td><span class="tag e">예상</span></td><td class="n">150,000~180,000</td></tr>
           <tr><td>여행자보험 4인</td><td><span class="tag e">예상</span></td><td class="n">30,000~50,000</td></tr>
           <tr><td>데이터 (eSIM 또는 로밍)</td><td><span class="tag e">예상</span></td><td class="n">20,000~40,000</td></tr>
           <tr class="sub"><td colspan="2">현지 예상 합계</td><td class="n">1,044,000~1,304,000</td></tr>
@@ -726,6 +726,8 @@ const PLACES={
   chuon:{n:"촌촌 뷰 카페",cat:'shop',area:'dd',q:"Chuon Chuon Bistro Sky Bar Phu Quoc",ll:[10.1985,103.9760],score:78,
     why:"언덕 위에서 시내가 내려다보이는 카페",info:"즈엉동 · 해 질 녘 전망이 좋아요",kid:"오르막이라 유모차는 차로 올라가요",sug:['d3','15:30']},
   /* 스파 */
+  seoulbarber:{n:"서울이발관",cat:'spa',area:'dd',q:"Seoul Barbershop 137 Tran Hung Dao Phu Quoc",ll:[10.2019,103.9681],score:86,
+    why:"킹콩마트 바로 옆 · 구글 4.7 (후기 1,400개 넘음) · 한국인 사장님 · 짐 보관, 샤워, 공항 샌딩",info:"137 쩐흥다오 · 08:00~23:00 · 귀청소·샴푸·마사지 토탈 케어 · 카카오톡 사전 예약 시 할인",kid:"키즈 네일 등 가족 구성 있음",sug:['d4','18:30'],todo:['spa']},
   oceanspa:{n:"오션스파 (Ocean Spa)",cat:'spa',area:'dd',q:"Ocean spa Tran Hung Dao Phu Quoc King Kong Mart",ll:[10.2017,103.9676],score:88,
     why:"킹콩마트 본점 바로 앞 · 구글 4.9 (후기 2,500개 넘음) · 짐 보관, 샤워 · 한국인 사장님",info:"07:00~22:00 · 아로마 90분 77만 동, 키즈 성장 마사지(키 100~139cm) 90분 65만 동 · 2인 이상 90분이면 무료 샌딩",kid:"키즈 마사지는 부모와 같은 시간에",sug:['d4','18:30'],todo:['spa']},
   meo:{n:"메오키친 (반쎄오)",cat:'food',area:'dd',q:"Meo Kitchen 126 Tran Hung Dao Phu Quoc",ll:[10.2022,103.9680],score:80,
@@ -819,12 +821,12 @@ const DEFAULT_PLAN=[
   {id:'q2a',day:'d4',time:'10:30',place:'safari',title:'빈펄 사파리 · 사파리 버스 (패스트트랙)',desc:'패스트트랙이라 줄 서지 않고 바로 탑승 · 맹수 구역을 버스로 돌아요',tip:'2일 콤보 + 패스트트랙 · 첫 입장 때 4명 얼굴 인식 등록'},
   {id:'q2h',day:'d4',time:'11:15',place:'safari',title:'걸어서 보는 구역 · 먹이주기',desc:'기린·코끼리 먹이주기, 4세 딸은 트램으로',tip:'사파리 버스 투어 패스트트랙 · 날짜 변경 요청 중(11/28 → 11/30)'},
   {id:'q2b',day:'d4',time:'12:45',place:'hotel',title:'리조트로 돌아와 점심 · 캐리어 찾기',desc:'사파리에서 무료 셔틀로 리조트 복귀'},
-  {id:'s4g',day:'d4',time:'14:15',place:'oceanspa',title:'오션스파 도착 · 짐 맡기기',desc:'13:40쯤 7인승 Grab에 캐리어 싣고 바로 스파로',tip:'여기부터 저녁까지 전부 걸어서 다녀요'},
-  {id:'s4h',day:'d4',time:'14:30',place:'kingkong',title:'킹콩마트 본점 쇼핑',desc:'스파 길 건너편 · 후추, 커피, 말린 망고, 과자, 기념품 · 정찰제, 카드 가능',tip:'가방은 입구에서 케이블 타이로 묶어요 · 산 물건은 스파에 맡겨 두기'},
+  {id:'s4g',day:'d4',time:'14:15',place:'seoulbarber',title:'서울이발관 도착 · 짐 맡기기',desc:'13:40쯤 7인승 Grab에 캐리어 싣고 바로 스파로',tip:'여기부터 저녁까지 전부 걸어서 다녀요'},
+  {id:'s4h',day:'d4',time:'14:30',place:'kingkong',title:'킹콩마트 본점 쇼핑',desc:'서울이발관 바로 옆 · 후추, 커피, 말린 망고, 과자, 기념품 · 정찰제, 카드 가능',tip:'가방은 입구에서 케이블 타이로 묶어요 · 산 물건은 스파에 맡겨 두기'},
   {id:'s4i',day:'d4',time:'16:00',place:'kroks',title:'끄록스 · 옷 가게 구경',desc:'크록스 스타일 신발, 가족 휴양룩',tip:'현금 준비 · 여러 개 사면 흥정'},
   {id:'q4g',day:'d4',time:'17:15',place:'meo',title:'저녁 · 메오키친',desc:'반쎄오, 소고기 볶음밥, 짜조, 계란부침',tip:'도착하면 번호표부터 · 대체: 같은 길 마담킴(한식·베트남식)'},
-  {id:'s4m',day:'d4',time:'18:30',place:'oceanspa',title:'오션스파 마사지 90분 · 샤워',desc:'어른 아로마 90분, 아이는 키즈 성장 마사지 · 끝나고 샤워',tip:'끝나면 스파 차량으로 공항 (예약 때 공항 드랍 확인)'},
-  {id:'q4i',day:'d4',time:'20:45',place:'airport',move:'스파 공항 드랍 · 약 20분',title:'공항 도착 · 탑승 수속',desc:'출발 2시간 30분 전'},
+  {id:'s4m',day:'d4',time:'18:30',place:'seoulbarber',title:'서울이발관 90분 · 샤워',desc:'90분 코스 4인 · 끝나고 샤워',tip:'끝나면 서울이발관 차량으로 공항 샌딩'},
+  {id:'q4i',day:'d4',time:'20:45',place:'airport',move:'서울이발관 공항 샌딩 · 약 20분',title:'공항 도착 · 탑승 수속',desc:'출발 2시간 30분 전'},
   {id:'q4j',day:'d4',time:'23:15',title:'푸꾸옥 출발 · 7C2316',desc:'12/1(화) 06:35 인천 1터미널 도착'}
 ];
 /* 예전 기본 일정 id — 저장된 변경분이 남아 있어도 무시 */
@@ -1126,7 +1128,7 @@ const DEFAULT_TASKS=[
  ["vw-buggy","빈원더스 버기카 추가 구매 (4인)","3일차용 · 앱이나 현장 · 1인 약 10만 동 예상, 실제 가격 확인",0],
  ["wonders-prep","빈원더스 준비물","유모차 대여, 아이들 여벌옷·수건, 얇은 겉옷(펭귄관), 아이 여권(키 확인)",0],
  ["cable","혼똔 케이블카 티켓 (A코스일 때)","왕복 성인 85만·아동 70만 동, 4인 약 176,000원 · 섬 안 워터파크 포함",0],
- ["spa","오션스파 예약 (카카오톡 푸꾸옥사랑)","11/30 18:30 · 90분 4인 · 키즈 마사지는 키 100~139cm · 짐 보관 14:15부터 · 20:00 공항 드랍 꼭 확인 · ☎ 070-8881-9889",0],
+ ["spa","서울이발관 예약 (카카오톡)","11/30 18:30 · 90분 4인 · 짐 보관 14:15부터 · 샤워 · 20:00 공항 샌딩 · 사전 예약 할인 확인",0],
  ["checkin","제주항공 좌석 지정·온라인 체크인","가족 좌석 붙여 앉기, 위탁수하물 허용량 확인",0],
  ["kids","아이 준비물","수영복·래시가드, 선크림, 모기 기피제, 상비약, 유모차",0],
  ["home","12/1(화) 귀가 교통·일정 확인","06:35 인천 도착 · 출근·등교 일정 조정",0],
