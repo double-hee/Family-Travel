@@ -398,7 +398,7 @@ details.card[open] summary{margin-bottom:6px}
     <div class="dayhead">
       <span class="no">DAY 4 · 11/30</span>
       <h2>체크아웃 · 사파리 · 즈엉동</h2>
-      <span class="meta">기사 포함 전용 차량 10:00~20:45 (약 11시간) · 체크아웃하고 바로 사파리, 오후엔 즈엉동에서 쇼핑 → 야시장 → 마사지 후 공항으로. 캐리어는 차에 실어 둬요</span>
+      <span class="meta">오전엔 셔틀로 사파리, 점심 후 Grab으로 즈엉동 루아스파에 짐을 맡기고 걸어서 쇼핑 → 야시장 → 마사지·샤워 후 스파 차량으로 공항</span>
       <a class="btn primary routebtn" data-route="d4" target="_blank" rel="noopener">하루 동선 지도로 보기</a>
     </div>
 
@@ -490,7 +490,7 @@ details.card[open] summary{margin-bottom:6px}
     <h2 class="ph">비용 정산</h2>
     <div class="sums">
       <div class="sum"><span>지금까지 쓴 돈</span><b id="sumSpent">-</b></div>
-      <div class="sum"><span>예상 총비용</span><b>약 319~354만원</b></div>
+      <div class="sum"><span>예상 총비용</span><b>약 316~342만원</b></div>
       <div class="sum"><span>예상 상한 대비 남은 돈</span><b id="sumLeft">-</b></div>
     </div>
 
@@ -548,14 +548,13 @@ details.card[open] summary{margin-bottom:6px}
           <tr><td>호텔 · 빈펄 리조트 3박 조식 포함</td><td><span class="tag p">결제</span></td><td class="n">874,229</td></tr>
           <tr class="sub"><td colspan="2">결제 완료 합계</td><td class="n">2,114,629</td></tr>
           <tr><td>입장권 · 빈원더스 앱 결제<br><small>2일 콤보 + 버기카(사파리·빈원더스·테디베어·간식) 691만 동 · 사파리 패스트트랙 + 그랜드월드 보트·베트남의 정수 공연 275만 5천 동</small></td><td><span class="tag p">결제</span></td><td class="n">514,044</td></tr>
-                              <tr><td>4일차 기사 포함 차량 (10:00~20:45)</td><td><span class="tag e">예상</span></td><td class="n">100,000~150,000</td></tr>
           <tr><td>공항 픽업 · Grab 이동</td><td><span class="tag e">예상</span></td><td class="n">80,000~120,000</td></tr>
           <tr><td>식비 · 간식 (점심·저녁 약 6끼)</td><td><span class="tag e">예상</span></td><td class="n">250,000~400,000</td></tr>
-          <tr><td>가족 스파 · 샤워</td><td><span class="tag e">예상</span></td><td class="n">80,000~150,000</td></tr>
+          <tr><td>루아스파 90분 4인 · 샤워<br><small>아로마 78만 동 × 3 + 어린이 64만 5천 동 + 팁 · 약 326만 동</small></td><td><span class="tag e">예상</span></td><td class="n">150,000~180,000</td></tr>
           <tr><td>여행자보험 4인</td><td><span class="tag e">예상</span></td><td class="n">30,000~50,000</td></tr>
           <tr><td>데이터 (eSIM 또는 로밍)</td><td><span class="tag e">예상</span></td><td class="n">20,000~40,000</td></tr>
-          <tr class="sub"><td colspan="2">현지 예상 합계</td><td class="n">1,074,000~1,424,000</td></tr>
-          <tr class="total"><td colspan="2">전체 예상</td><td class="n">약 3,189,000~3,539,000</td></tr>
+          <tr class="sub"><td colspan="2">현지 예상 합계</td><td class="n">1,044,000~1,304,000</td></tr>
+          <tr class="total"><td colspan="2">전체 예상</td><td class="n">약 3,159,000~3,419,000</td></tr>
         </tbody>
       </table>
     </div>
@@ -622,7 +621,7 @@ details.card[open] summary{margin-bottom:6px}
       <span class="chip">성인 2 · 초등 아들(11세) · 딸(4세)</span>
       <span class="chip">1~3일차: Grab · 리조트 셔틀</span>
       <span class="chip">항공·호텔 결제 완료</span>
-      <span class="chip">4일차: 기사 포함 단독 차량 약 11시간</span>
+      <span class="chip">4일차: Grab + 스파 공항 드랍</span>
     </div>
     <div class="bk">
       <div class="card">
@@ -727,6 +726,12 @@ const PLACES={
   chuon:{n:"촌촌 뷰 카페",cat:'shop',area:'dd',q:"Chuon Chuon Bistro Sky Bar Phu Quoc",ll:[10.1985,103.9760],score:78,
     why:"언덕 위에서 시내가 내려다보이는 카페",info:"즈엉동 · 해 질 녘 전망이 좋아요",kid:"오르막이라 유모차는 차로 올라가요",sug:['d3','15:30']},
   /* 스파 */
+  luaspa:{n:"루아스파 (LUA SPA)",cat:'spa',area:'dd',q:"LUA SPA 25 Tran Hung Dao Duong Dong Phu Quoc",ll:[10.2138,103.9591],score:86,
+    why:"야시장까지 걸어서 3분 · 짐 무료 보관, 방마다 샤워 · 한국어 카카오톡 예약",info:"10:00~22:00 · 아로마 90분 78만 동, 어린이(만 11세까지) 90분 64만 5천 동 · 팁 90분 6만 9천 동 별도",kid:"어린이 마사지 코스 있음",sug:['d4','18:45'],todo:['spa']},
+  dinhcau:{n:"딘꺼우 사원 · 즈엉동 바닷가",cat:'sight',area:'dd',q:"Dinh Cau Temple Phu Quoc",ll:[10.2173,103.9565],score:74,
+    why:"바다 위 바위에 선 작은 사원과 등대 · 해 질 녘 산책",info:"야시장 바로 옆 · 무료",kid:"계단과 바위가 있어 손 잡고",sug:['d4','16:30']},
+  ddmarket:{n:"즈엉동 시장",cat:'shop',area:'dd',q:"Cho Duong Dong Phu Quoc",ll:[10.2160,103.9615],score:70,
+    why:"현지 재래시장 · 말린 해산물, 후추, 과일, 기념품",info:"야시장에서 걸어서 10분쯤 · 오후 늦게는 일찍 닫는 가게도 있어요",kid:"",sug:['d4','15:00']},
   spaair:{n:"공항 근처 샤워 가능 스파",cat:'spa',area:'air',q:"spa near Phu Quoc International Airport",ll:[10.1750,103.9780],score:75,
     why:"마지막 날 샤워하고 비행기 타기",info:"가족 4인 · 샤워 가능 여부 확인",kid:"아이 마사지 가능 여부 확인",sug:['d4','18:30'],todo:['spa']},
   mudspa:{n:"온천 스파 또는 키즈카페",cat:'spa',area:'dd',q:"mud bath spa Phu Quoc",ll:[10.2050,103.9700],score:68,
@@ -804,19 +809,20 @@ const DEFAULT_PLAN=[
   {id:'q3k',day:'d3',time:'18:45',place:'once',title:'원스 쇼',desc:'20분',tip:'성 앞 광장 왼쪽이 잘 보여요'},
   {id:'q3l',day:'d3',time:'19:15',place:'hotel',title:'숙소 복귀 · 짐 싸기',desc:'다음 날 체크아웃 준비'},
   {id:'q4a',day:'d4',time:'08:30',place:'hotel',title:'리조트 조식 · 짐 싸기',desc:''},
-  {id:'q4b',day:'d4',time:'10:00',place:'hotel',title:'빈펄 리조트 체크아웃',desc:'전용 차량에 짐 싣고 출발',tip:'사파리까지 차로 약 15분'},
+  {id:'q4b',day:'d4',time:'10:00',place:'hotel',title:'빈펄 리조트 체크아웃',desc:'캐리어는 프런트에 맡기고 무료 셔틀로 사파리',tip:'셔틀 시간표는 프런트에서 확인'},
   {id:'q2a',day:'d4',time:'10:30',place:'safari',title:'빈펄 사파리 · 사파리 버스 (패스트트랙)',desc:'패스트트랙이라 줄 서지 않고 바로 탑승 · 맹수 구역을 버스로 돌아요',tip:'2일 콤보 + 패스트트랙 · 첫 입장 때 4명 얼굴 인식 등록'},
   {id:'q2h',day:'d4',time:'11:15',place:'safari',title:'걸어서 보는 구역 · 먹이주기',desc:'기린·코끼리 먹이주기, 4세 딸은 트램으로',tip:'사파리 버스 투어 패스트트랙 · 날짜 변경 요청 중(11/28 → 11/30)'},
-  {id:'q2b',day:'d4',time:'12:30',place:'whale',title:'점심 · 웨일마운틴',desc:'사파리 근처 · 해산물·구이, 아이들용 볶음밥'},
-  {id:'q4e',day:'d4',time:'14:15',place:'chuon',title:'촌촌 카페',desc:'즈엉동으로 내려와 언덕 위 카페에서 쉬기'},
-  {id:'q4d',day:'d4',time:'15:30',place:'kingkong',title:'킹콩마트 쇼핑',desc:'과자, 커피, 말린 망고, 기념품 마지막 장보기',tip:'산 짐은 차에 실어 두면 돼요'},
-  {id:'q4g',day:'d4',time:'17:00',place:'market',title:'즈엉동 야시장 · 저녁',desc:'해산물 구이, 철판 아이스크림 · 해 지기 전에 도착해 여유 있게',tip:'분꾸어이 끼엔사이 본점이 바로 옆'},
-  {id:'s4m',day:'d4',time:'18:30',place:'spaair',title:'마사지 90분 · 샤워',desc:'비행 전에 씻고 마사지 · 아이들은 짧은 코스나 발 마사지',tip:'4인 예약 · 끝나면 공항까지 차로 약 10분'},
-  {id:'q4i',day:'d4',time:'20:45',place:'airport',title:'공항 도착 · 탑승 수속',desc:'출발 2시간 30분 전'},
+  {id:'q2b',day:'d4',time:'12:45',place:'hotel',title:'리조트로 돌아와 점심 · 캐리어 찾기',desc:'사파리에서 무료 셔틀로 리조트 복귀'},
+  {id:'s4g',day:'d4',time:'14:15',place:'luaspa',title:'루아스파 도착 · 짐 맡기기',desc:'13:40쯤 7인승 Grab에 캐리어 싣고 바로 스파로 · 짐은 무료 보관',tip:'마사지 시간(18:45)도 이때 다시 확인'},
+  {id:'s4h',day:'d4',time:'15:00',place:'ddmarket',title:'즈엉동 시장 구경 · 쇼핑',desc:'후추, 말린 망고·해산물, 기념품 · 걸어서 이동'},
+  {id:'s4i',day:'d4',time:'16:30',place:'dinhcau',title:'딘꺼우 사원 · 바닷가 산책',desc:'바다 위 바위 사원과 등대 · 노을은 17:40쯤'},
+  {id:'q4g',day:'d4',time:'17:15',place:'market',title:'즈엉동 야시장 · 저녁',desc:'해산물 구이, 철판 아이스크림, 기념품 가게',tip:'분꾸어이 끼엔사이 본점이 바로 옆'},
+  {id:'s4m',day:'d4',time:'18:45',place:'luaspa',title:'루아스파 마사지 90분 · 샤워',desc:'어른 아로마 90분, 아이들은 어린이 마사지 · 끝나고 샤워',tip:'끝나면 스파 차량으로 공항 드랍 (예약 때 확인)'},
+  {id:'q4i',day:'d4',time:'20:45',place:'airport',move:'스파 공항 드랍 · 약 20분',title:'공항 도착 · 탑승 수속',desc:'출발 2시간 30분 전'},
   {id:'q4j',day:'d4',time:'23:15',title:'푸꾸옥 출발 · 7C2316',desc:'12/1(화) 06:35 인천 1터미널 도착'}
 ];
 /* 예전 기본 일정 id — 저장된 변경분이 남아 있어도 무시 */
-const RETIRED=new Set(['q4f','q4c','q4h','r4a','r4b','r4c','r4d','p2a','p2b','p2c','p2d','p2e','p3a','p3b','p3c','p3d','p3e','p3f','p4a','p4b','p4c','p4d','p4e','p4f','p4g','p4h','p4i','p4j','p4k','p4l']);
+const RETIRED=new Set(['q4d','q4e','q4f','q4c','q4h','r4a','r4b','r4c','r4d','p2a','p2b','p2c','p2d','p2e','p3a','p3b','p3c','p3d','p3e','p3f','p4a','p4b','p4c','p4d','p4e','p4f','p4g','p4h','p4i','p4j','p4k','p4l']);
 const DAYNAMES={d1:'1일차 11/27(금)',d2:'2일차 11/28(토)',d3:'3일차 11/29(일)',d4:'4일차 11/30(월)',d4a:'4일차 11/30(월)',d4b:'4일차 11/30(월)'};
 const DAYSHORT={d1:'1일차',d2:'2일차',d3:'3일차',d4:'4일차',d4a:'4일차',d4b:'4일차'};
 const gq=s=>encodeURIComponent(s);
@@ -844,13 +850,12 @@ function moveText(fromId,toId,dayKey,override){
   if(override)return {mode:'픽업',text:override};
   const A=PLACES[fromId],B=PLACES[toId];if(!A||!B||fromId===toId)return null;
   const d=km(A.ll,B.ll)*1.25;
-  const car=dayKey==='d4'||dayKey==='d4a'||dayKey==='d4b';
+  const car=false;
   if(A.cx==='vin'&&B.cx==='vin'&&!(car&&d>=0.9)){
     if(d<0.9)return {mode:'도보',text:`약 ${Math.max(3,Math.round(d/4*60))}분`,mins:Math.max(3,Math.round(d/4*60))};
     return {mode:'단지 셔틀',text:`리조트 무료 셔틀·버기 약 ${Math.round(d/20*60)+5}분`,mins:Math.round(d/20*60)+5};}
   if(d<0.8)return {mode:'도보',text:`약 ${Math.max(3,Math.round(d/4*60))}분`,mins:Math.max(3,Math.round(d/4*60))};
   const mins=Math.round(d/(d>10?45:28)*60)+3, kmTxt=`${d<10?d.toFixed(1):Math.round(d)}km`;
-  if(dayKey==='d4'||dayKey==='d4a'||dayKey==='d4b')return {mode:'전용 차량',text:`약 ${mins}분 · ${kmTxt}`,mins};
   const vnd=Math.round((20000+15000*d)/10000)*10000;
   return {mode:'Grab',text:`약 ${mins}분 · ${kmTxt} · 7인승 약 ${(vnd/10000).toFixed(0)}만 동`,mins};
 }
@@ -1100,7 +1105,7 @@ function pick(id,save){
 // 구글 Apps Script 웹 앱 URL(…/exec)을 넣으면 가족이 함께 체크·기록해요. 비워 두면 이 기기에만 저장돼요.
 const API_URL='https://script.google.com/macros/s/AKfycbyR_rFx0NCN4NQqULiZhu7qgcUyjx-rxQ9ARZI1l09zy6x3r0OjlMP2JNMNaz5gmZ5h/exec';
 const RATE={KRW:1,VND:0.054,USD:1400};
-const BUDGET_MAX=3539000;
+const BUDGET_MAX=3419000;
 const DEFAULT_TASKS=[
  ["passport","여권 유효기간 확인 (4명)","입국일 기준 6개월 이상 남아야 해요. 아이들 여권도 확인",0],
  ["family-cert","영문 가족관계증명서 준비","아이들과 함께 갈 때 챙기면 좋아요. 정부24에서 발급",0],
@@ -1110,12 +1115,12 @@ const DEFAULT_TASKS=[
  ["money","환전 · 결제 수단 준비","토스나 하나머니 앱에서 해외 QR결제(GLN) 설정 · 트래블카드 · 야시장용 현금(동)은 달러로 가져가 현지 환전",0],
  ["pickup-confirm","호텔 픽업 버스 확정 답장 받기","11/5 신청 메일 보냄 · 도착 1주 전까지 답이 없으면 하나투어(1577-1233)나 호텔(+84-297-3550550)에 확인",0],
  ["combo-date","콤보·패스트트랙 날짜 변경 (11/28 → 11/29·30)","2일 콤보는 11/29~30에 쓰도록, 사파리 버스 패스트트랙은 11/30으로 · 변경 메일 보내고 답장 받기",0],
- ["day4-car","4일차 기사 포함 차량 예약","10:00~20:45, 약 11시간 · 7인승 · 리조트 → 사파리 → 즈엉동 → 공항",0],
+
  ["tickets","입장권 결제","2일 콤보 + 버기카, 사파리 패스트트랙, 그랜드월드 보트·공연 · 빈원더스 앱 내 머니로 결제",1],
  ["vw-buggy","빈원더스 버기카 추가 구매 (4인)","3일차용 · 앱이나 현장 · 1인 약 10만 동 예상, 실제 가격 확인",0],
  ["wonders-prep","빈원더스 준비물","유모차 대여, 아이들 여벌옷·수건, 얇은 겉옷(펭귄관), 아이 여권(키 확인)",0],
  ["cable","혼똔 케이블카 티켓 (A코스일 때)","왕복 성인 85만·아동 70만 동, 4인 약 176,000원 · 섬 안 워터파크 포함",0],
- ["spa","4일차 마사지 예약","11/30 18:30 · 90분 · 4인 · 샤워 가능한 곳 · 공항 샌딩 되면 좋아요",0],
+ ["spa","루아스파 예약 (카카오톡)","11/30 18:45 · 90분 4인(어른 3·어린이 1) · 짐 보관 14:15부터 · 20:15 공항 드랍 되는지 꼭 확인 · pf.kakao.com/_IfWxdn",0],
  ["checkin","제주항공 좌석 지정·온라인 체크인","가족 좌석 붙여 앉기, 위탁수하물 허용량 확인",0],
  ["kids","아이 준비물","수영복·래시가드, 선크림, 모기 기피제, 상비약, 유모차",0],
  ["home","12/1(화) 귀가 교통·일정 확인","06:35 인천 도착 · 출근·등교 일정 조정",0],
