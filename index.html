@@ -326,6 +326,10 @@ dialog.pv.bare .pvtop,dialog.pv.bare .pvhint{display:none}
 .atimg img{width:100%;height:100%;object-fit:cover;display:block}
 .atimg .st{position:absolute;inset:auto 0 0 0;font-size:11px;background:rgba(0,0,0,.6);color:#fff;padding:2px 4px;text-align:center}
 .atimg .st.err{background:var(--d4)}
+.atfile{display:grid;place-items:center;align-content:center;gap:4px;padding:6px;cursor:pointer;color:var(--ink)}
+.fic{font:700 12px/1 var(--mono);color:#fff;background:#c0392b;border-radius:4px;padding:5px 6px}
+.fn{font-size:11px;line-height:1.3;max-width:100%;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;word-break:break-all;text-align:center}
+.bkph .bkfile{width:76px;height:auto;min-height:76px;display:grid;place-items:center;align-content:center;gap:4px;padding:6px 4px;cursor:pointer}
 .attl{font-size:12px;padding:5px 7px}
 .attx{position:absolute;top:-6px;right:-6px;width:24px;height:24px;border-radius:50%;border:0;background:var(--ink);color:var(--bg);font-size:15px;line-height:1;cursor:pointer;display:grid;place-items:center}
 .pchip{font:inherit;font-size:11px;border:1px solid var(--line);background:var(--chip);color:var(--sea);border-radius:999px;padding:0 8px;cursor:pointer;vertical-align:1px}
@@ -594,9 +598,9 @@ details.card[open] summary{margin-bottom:6px}
           <select class="inp" id="bkCur" aria-label="통화"><option>KRW</option><option>VND</option><option>USD</option></select></div></div>
         <div class="f wide"><label for="bkMemo">메모</label><input class="inp" id="bkMemo" maxlength="300" placeholder="인원, 포함 사항, 취소 조건 등"></div>
         <div class="f wide att" id="bkAtt">
-          <div class="atthead"><b>티켓·바우처 사진</b><button type="button" class="ghostbtn" data-att-add>+ 사진</button><span class="formmsg" data-att-msg>같은 예약의 티켓 여러 장을 한 번에 묶어요 · 사진마다 이름표(예: 아빠)를 붙일 수 있어요</span></div>
+          <div class="atthead"><b>티켓·바우처 사진 · PDF</b><button type="button" class="ghostbtn" data-att-add>+ 사진·파일</button><span class="formmsg" data-att-msg>같은 예약의 티켓 여러 장을 한 번에 묶어요 · 사진·PDF마다 이름표(예: 아빠)를 붙일 수 있어요 · PDF는 10MB까지</span></div>
           <div class="attgrid"></div>
-          <input type="file" accept="image/*" multiple hidden data-att-input>
+          <input type="file" accept="image/*,application/pdf,.pdf" multiple hidden data-att-input>
         </div>
         <label class="chk f wide" id="bkExpWrap"><input type="checkbox" id="bkToExp" checked> 금액이 있으면 비용 탭 지출에도 기록</label>
         <div class="act"><button class="go" id="bkSubmit" type="submit">추가</button><button class="ghostbtn" id="bkCancel" type="button">닫기</button><span class="formmsg" id="bkMsg"></span></div>
@@ -1356,11 +1360,23 @@ function shrinkTo(src,max,q){return new Promise((res,rej)=>{
     c.getContext('2d').drawImage(img,0,0,c.width,c.height);if(isFile)URL.revokeObjectURL(url);res(c.toDataURL('image/jpeg',q));};
   img.onerror=()=>{if(isFile)URL.revokeObjectURL(url);rej(new Error('사진을 열 수 없어요'));};
   img.src=url;});}
-async function uploadData(dataUrl,name){
+async function uploadData(dataUrl,name,mime){
   const r=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},
-    body:JSON.stringify({action:'uploadPhoto',image:dataUrl.split(',')[1],mime:'image/jpeg',name})});
+    body:JSON.stringify({action:'uploadPhoto',image:dataUrl.split(',')[1],mime:mime||'image/jpeg',name})});
   const d=await r.json();if(!d.ok)throw new Error(d.error||'올리지 못했어요');return d.id;
 }
+/* open an attached PDF: new tab on iPhone/PC, the phone's PDF viewer or download on Android */
+async function openFile(p){
+  const android=/Android/i.test(navigator.userAgent);  // Android Chrome can't show a PDF in a tab: save it and the phone opens it
+  const w=android?null:window.open('','_blank');
+  try{const u=await photoUrl(p.id);const b64=u.slice(u.indexOf(',')+1),bin=atob(b64),arr=new Uint8Array(bin.length);
+    for(let i=0;i<bin.length;i++)arr[i]=bin.charCodeAt(i);
+    const url=URL.createObjectURL(new Blob([arr],{type:'application/pdf'}));
+    if(w&&!w.closed)w.location.href=url;else{const a=document.createElement('a');a.href=url;a.download=p.n||'file.pdf';document.body.append(a);a.click();a.remove();}
+    setTimeout(()=>URL.revokeObjectURL(url),60000);
+  }catch(e){if(w)w.close();alertNote('파일을 열지 못했어요 · '+(e.message||'다시 시도해 주세요'));}
+}
+function alertNote(t){const n=$('bkNote');if(n){n.textContent=t;}}
 function dropPhoto(p){[p.id,p.t].filter(Boolean).forEach(id=>fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'deletePhoto',id})}).catch(()=>{}));}
 /* gallery viewer — lives at the top level so it shows from any tab */
 document.body.append($('photoView'));
@@ -1446,10 +1462,21 @@ function makeAtt(root,opt){
   const grid=root.querySelector('.attgrid'),msg=root.querySelector('[data-att-msg]'),inp=root.querySelector('[data-att-input]'),hint=msg.textContent;
   let items=[],removed=[];
   function render(){
-    grid.innerHTML=items.map((p,i)=>`<div class="ati"><button type="button" class="atimg" data-view="${i}" aria-label="사진 ${i+1} 크게 보기"><img alt="" ${p.prev?`src="${p.prev}"`:p.t?`data-t="${esc(p.t)}"`:''}>${p.st==='up'?'<span class="st">올리는 중</span>':p.st==='err'?'<span class="st err">실패 · 빼고 다시</span>':''}</button>`+
+    const st=p=>p.st==='up'?'<span class="st">올리는 중</span>':p.st==='err'?'<span class="st err">실패 · 빼고 다시</span>':'';
+    grid.innerHTML=items.map((p,i)=>`<div class="ati">${p.k==='f'
+      ?`<button type="button" class="atimg atfile" data-file="${i}" aria-label="${esc(p.n||'PDF')} 열기"><span class="fic">PDF</span><span class="fn">${esc(p.n||'파일')}</span>${st(p)}</button>`
+      :`<button type="button" class="atimg" data-view="${i}" aria-label="사진 ${i+1} 크게 보기"><img alt="" ${p.prev?`src="${p.prev}"`:p.t?`data-t="${esc(p.t)}"`:''}>${st(p)}</button>`}`+
       (opt.labels?`<input class="inp attl" data-l="${i}" maxlength="30" placeholder="이름표" aria-label="사진 ${i+1} 이름표" value="${esc(p.label||'')}">`:'')+
       `<button type="button" class="attx" data-x="${i}" aria-label="사진 ${i+1} 빼기">×</button></div>`).join('');
     hydrateThumbs(grid);
+  }
+  async function addFile(file,name){
+    const it={st:'up',label:file.name.replace(/\.pdf$/i,'').slice(0,30),isNew:true,k:'f',n:file.name.slice(0,80)};items.push(it);render();
+    try{if(file.size>10*1024*1024)throw new Error('PDF는 10MB까지 올릴 수 있어요');
+      const url=await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=()=>rej(new Error('파일을 읽지 못했어요'));r.readAsDataURL(file);});
+      const id=await uploadData(url,name,'application/pdf');it.id=id;it.st='ok';photoCache[id]=url.replace(/^data:[^;]*;/,'data:application/pdf;');
+    }catch(e){it.st='err';msg.textContent='파일을 올리지 못했어요 · '+(e.message||'다시 시도해 주세요');}
+    render();
   }
   async function addSource(src,name){
     const it={st:'up',label:'',isNew:true};items.push(it);
@@ -1463,17 +1490,20 @@ function makeAtt(root,opt){
   root.querySelector('[data-att-add]').addEventListener('click',()=>{
     if(!API_URL){msg.textContent='사진 첨부는 공유 저장소에 연결된 사이트에서만 돼요';return;}inp.click();});
   inp.addEventListener('change',e=>{const files=[...(e.target.files||[])];e.target.value='';
-    files.slice(0,20).forEach(f=>addSource(f,opt.name()));msg.textContent=hint;});
+    msg.textContent=hint;
+    files.slice(0,20).forEach(f=>{const pdf=f.type==='application/pdf'||/\.pdf$/i.test(f.name);
+      if(pdf&&opt.files)addFile(f,opt.name());else if(pdf)msg.textContent='여기에는 사진만 붙일 수 있어요';else addSource(f,opt.name());});});
   grid.addEventListener('click',e=>{
     const x=e.target.closest('[data-x]');if(x){const p=items[+x.dataset.x];items.splice(+x.dataset.x,1);
       if(p&&p.id){if(p.isNew)dropPhoto(p);else removed.push(p);}render();return;}
-    const v=e.target.closest('[data-view]');if(v){const vis=items.map((p,idx)=>({p,idx})).filter(o=>o.p.id||o.p.prev);
+    const fo=e.target.closest('[data-file]');if(fo){const p=items[+fo.dataset.file];if(p&&p.id)openFile(p);return;}
+    const v=e.target.closest('[data-view]');if(v){const vis=items.map((p,idx)=>({p,idx})).filter(o=>o.p.k!=='f'&&(o.p.id||o.p.prev));
       openViewer(vis.map(o=>({id:o.p.id,t:o.p.t,src:o.p.id?null:o.p.prev,label:o.p.label})),Math.max(0,vis.findIndex(o=>o.idx===+v.dataset.view)));}
   });
   grid.addEventListener('input',e=>{const l=e.target.closest('[data-l]');if(l)items[+l.dataset.l].label=l.value;});
   return {
-    set(list){items.filter(p=>p.isNew&&p.id).forEach(dropPhoto);items=(list||[]).map(p=>({id:p.id,t:p.t,label:p.label||'',st:'ok',isNew:false}));removed=[];msg.textContent=hint;render();},
-    get(){return items.filter(p=>p.st==='ok'&&p.id).map(p=>({id:p.id,t:p.t,label:(p.label||'').trim()}));},
+    set(list){items.filter(p=>p.isNew&&p.id).forEach(dropPhoto);items=(list||[]).map(p=>({id:p.id,t:p.t,label:p.label||'',k:p.k,n:p.n,st:'ok',isNew:false}));removed=[];msg.textContent=hint;render();},
+    get(){return items.filter(p=>p.st==='ok'&&p.id).map(p=>{const o={id:p.id,t:p.t,label:(p.label||'').trim()};if(p.k==='f'){o.k='f';o.n=p.n;}return o;});},
     busy(){return items.some(p=>p.st==='up');},
     commit(){removed.forEach(dropPhoto);removed=[];items.forEach(p=>p.isNew=false);},
     discard(){items.filter(p=>p.isNew&&p.id).forEach(dropPhoto);items=[];removed=[];msg.textContent=hint;render();},
@@ -1481,7 +1511,7 @@ function makeAtt(root,opt){
   };
 }
 const exAtt=makeAtt($('exAtt'),{labels:false,name:()=>'expense'});
-const bkAtt=makeAtt($('bkAtt'),{labels:true,name:()=>'booking'});
+const bkAtt=makeAtt($('bkAtt'),{labels:true,files:true,name:()=>'booking'});
 const form=document.getElementById('exForm'),msg=document.getElementById('exMsg');
 document.getElementById('exDate').value=new Date().toLocaleDateString('sv-SE');
 document.getElementById('exPayer').value=me();
@@ -1591,7 +1621,11 @@ function renderBookings(){
       ${x.amount>0?`<dt>금액</dt><dd class="mono">${won(krw(x))}원${x.cur!=='KRW'?` (${Number(x.amount).toLocaleString('ko-KR')} ${x.cur})`:''}</dd>`:''}
       ${x.memo?`<dt>메모</dt><dd>${esc(x.memo)}</dd>`:''}
     </dl>
-    ${x.photos&&x.photos.length?`<div class="phcnt">사진 ${x.photos.length}장${x.photos.length>1?' · 눌러서 좌우로 넘겨 보기':''}</div><div class="bkph">${x.photos.map((p,i)=>`<button type="button" data-bph="${esc(x.id)}" data-i="${i}" aria-label="${esc(p.label||'사진 '+(i+1))} 크게 보기"><img alt="" data-t="${esc(p.t||p.id)}">${p.label?`<span>${esc(p.label)}</span>`:''}</button>`).join('')}</div>`:''}
+    ${x.photos&&x.photos.length?(()=>{const ph=x.photos.filter(p=>p.k!=='f'),fl=x.photos.filter(p=>p.k==='f');
+      const cnt=[ph.length?`사진 ${ph.length}장`:'',fl.length?`PDF ${fl.length}개`:''].filter(Boolean).join(' · ');
+      return `<div class="phcnt">${cnt}${ph.length>1?' · 사진은 눌러서 좌우로 넘겨 보기':''}</div><div class="bkph">${
+        ph.map((p,i)=>`<button type="button" data-bph="${esc(x.id)}" data-i="${i}" aria-label="${esc(p.label||'사진 '+(i+1))} 크게 보기"><img alt="" data-t="${esc(p.t||p.id)}">${p.label?`<span>${esc(p.label)}</span>`:''}</button>`).join('')}${
+        fl.map(p=>`<button type="button" class="bkfile" data-bfile="${esc(x.id)}" data-fid="${esc(p.id)}" aria-label="${esc(p.label||p.n||'PDF')} 열기"><span class="fic">PDF</span><span class="fn">${esc(p.label||p.n||'파일')}</span></button>`).join('')}</div>`;})():''}
     <div class="rowbtns"><button class="edit" type="button" data-id="${esc(x.id)}">수정</button><button class="del" type="button" data-id="${esc(x.id)}">삭제</button></div>
   </li>`).join(''):'<li class="empty">아직 추가한 예약이 없어요. 입장권, 픽업, 스파처럼 예약한 것을 기록해 두세요.</li>';
   if(API_URL){hydrateThumbs($('bkList'));prefetch(xs.flatMap(x=>(x.photos||[]).map(p=>p.id)));}
@@ -1608,7 +1642,8 @@ function bkClose(){ bkReset();$('bkCard').hidden=true;$('bkAddBtn').hidden=false
 $('bkAddBtn').addEventListener('click',()=>{bkReset();bkOpen();$('bkMsg').textContent='';$('bkNote').textContent='';$('bkName').focus();});
 $('bkCancel').addEventListener('click',()=>{bkClose();});
 $('bkList').addEventListener('click',e=>{
-  const bp=e.target.closest('[data-bph]');if(bp){const x=store.bookings.find(v=>v.id===bp.dataset.bph);if(x)openViewer(x.photos.map((p,i)=>({id:p.id,t:p.t,label:p.label||`${x.title} ${i+1}`})),+bp.dataset.i);return;}
+  const bf=e.target.closest('[data-bfile]');if(bf){const x=store.bookings.find(v=>v.id===bf.dataset.bfile);const p=x&&(x.photos||[]).find(q=>q.id===bf.dataset.fid);if(p)openFile(p);return;}
+  const bp=e.target.closest('[data-bph]');if(bp){const x=store.bookings.find(v=>v.id===bp.dataset.bph);if(x)openViewer(x.photos.filter(p=>p.k!=='f').map((p,i)=>({id:p.id,t:p.t,label:p.label||`${x.title} ${i+1}`})),+bp.dataset.i);return;}
   const ed=e.target.closest('.edit');
   if(ed){const x=store.bookings.find(v=>v.id===ed.dataset.id);if(!x)return;
     bkReset();editingBk=x.id;$('bkHead').textContent='예약 수정';$('bkSubmit').textContent='저장';$('bkExpWrap').hidden=true;
@@ -1628,7 +1663,7 @@ $('bkForm').addEventListener('submit',async e=>{
   const amount=Number(($('bkAmt').value||'0').replace(/[,\s]/g,''));
   if(!title){m.textContent='예약 이름을 입력해 주세요';$('bkName').focus();return;}
   if(!(amount>=0)){m.textContent='금액은 숫자로 입력해 주세요';$('bkAmt').focus();return;}
-  if(bkAtt.busy()){m.textContent='사진을 올리는 중이에요. 잠시 후 다시 눌러 주세요';return;}
+  if(bkAtt.busy()){m.textContent='사진·파일을 올리는 중이에요. 잠시 후 다시 눌러 주세요';return;}
   const fields={type:$('bkType').value,title,date:$('bkDate').value,time:$('bkTime').value,place:$('bkPlace').value.trim(),
     confirmNo:$('bkNo').value.trim(),amount,cur:$('bkCur').value,memo:$('bkMemo').value.trim(),photos:bkAtt.get()};
   bkAtt.commit();
