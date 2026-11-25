@@ -398,7 +398,7 @@ details.card[open] summary{margin-bottom:6px}
     <div class="dayhead">
       <span class="no">DAY 4 · 11/30</span>
       <h2>체크아웃 · 사파리 · 즈엉동</h2>
-      <span class="meta">기사 포함 전용 차량 10:00~20:45 (약 11시간) · 체크아웃하고 바로 사파리, 오후엔 즈엉동에서 쉬고 저녁 먹고 공항으로. 캐리어는 차에 실어 둬요</span>
+      <span class="meta">기사 포함 전용 차량 10:00~20:45 (약 11시간) · 체크아웃하고 바로 사파리, 오후엔 즈엉동에서 쇼핑 → 야시장 → 마사지 후 공항으로. 캐리어는 차에 실어 둬요</span>
       <a class="btn primary routebtn" data-route="d4" target="_blank" rel="noopener">하루 동선 지도로 보기</a>
     </div>
 
@@ -809,14 +809,14 @@ const DEFAULT_PLAN=[
   {id:'q2h',day:'d4',time:'11:15',place:'safari',title:'걸어서 보는 구역 · 먹이주기',desc:'기린·코끼리 먹이주기, 4세 딸은 트램으로',tip:'사파리 버스 투어 패스트트랙 · 날짜 변경 요청 중(11/28 → 11/30)'},
   {id:'q2b',day:'d4',time:'12:30',place:'whale',title:'점심 · 웨일마운틴',desc:'사파리 근처 · 해산물·구이, 아이들용 볶음밥'},
   {id:'q4e',day:'d4',time:'14:15',place:'chuon',title:'촌촌 카페',desc:'즈엉동으로 내려와 언덕 위 카페에서 쉬기'},
-  {id:'q4f',day:'d4',time:'15:30',place:'mudspa',title:'키즈카페 또는 머드 스파',desc:'날씨에 따라 골라요 · 비행 전에 샤워까지'},
-  {id:'q4g',day:'d4',time:'17:30',place:'market',title:'즈엉동 야시장 · 저녁',desc:'철판 아이스크림, 해산물 구이',tip:'분꾸어이 끼엔사이 본점이 바로 옆'},
-  {id:'q4d',day:'d4',time:'19:00',place:'kingkong',title:'킹콩마트 쇼핑',desc:'과자, 망고, 기념품 마지막 장보기'},
+  {id:'q4d',day:'d4',time:'15:30',place:'kingkong',title:'킹콩마트 쇼핑',desc:'과자, 커피, 말린 망고, 기념품 마지막 장보기',tip:'산 짐은 차에 실어 두면 돼요'},
+  {id:'q4g',day:'d4',time:'17:00',place:'market',title:'즈엉동 야시장 · 저녁',desc:'해산물 구이, 철판 아이스크림 · 해 지기 전에 도착해 여유 있게',tip:'분꾸어이 끼엔사이 본점이 바로 옆'},
+  {id:'s4m',day:'d4',time:'18:30',place:'spaair',title:'마사지 90분 · 샤워',desc:'비행 전에 씻고 마사지 · 아이들은 짧은 코스나 발 마사지',tip:'4인 예약 · 끝나면 공항까지 차로 약 10분'},
   {id:'q4i',day:'d4',time:'20:45',place:'airport',title:'공항 도착 · 탑승 수속',desc:'출발 2시간 30분 전'},
   {id:'q4j',day:'d4',time:'23:15',title:'푸꾸옥 출발 · 7C2316',desc:'12/1(화) 06:35 인천 1터미널 도착'}
 ];
 /* 예전 기본 일정 id — 저장된 변경분이 남아 있어도 무시 */
-const RETIRED=new Set(['q4c','q4h','r4a','r4b','r4c','r4d','p2a','p2b','p2c','p2d','p2e','p3a','p3b','p3c','p3d','p3e','p3f','p4a','p4b','p4c','p4d','p4e','p4f','p4g','p4h','p4i','p4j','p4k','p4l']);
+const RETIRED=new Set(['q4f','q4c','q4h','r4a','r4b','r4c','r4d','p2a','p2b','p2c','p2d','p2e','p3a','p3b','p3c','p3d','p3e','p3f','p4a','p4b','p4c','p4d','p4e','p4f','p4g','p4h','p4i','p4j','p4k','p4l']);
 const DAYNAMES={d1:'1일차 11/27(금)',d2:'2일차 11/28(토)',d3:'3일차 11/29(일)',d4:'4일차 11/30(월)',d4a:'4일차 11/30(월)',d4b:'4일차 11/30(월)'};
 const DAYSHORT={d1:'1일차',d2:'2일차',d3:'3일차',d4:'4일차',d4a:'4일차',d4b:'4일차'};
 const gq=s=>encodeURIComponent(s);
@@ -1115,7 +1115,7 @@ const DEFAULT_TASKS=[
  ["vw-buggy","빈원더스 버기카 추가 구매 (4인)","3일차용 · 앱이나 현장 · 1인 약 10만 동 예상, 실제 가격 확인",0],
  ["wonders-prep","빈원더스 준비물","유모차 대여, 아이들 여벌옷·수건, 얇은 겉옷(펭귄관), 아이 여권(키 확인)",0],
  ["cable","혼똔 케이블카 티켓 (A코스일 때)","왕복 성인 85만·아동 70만 동, 4인 약 176,000원 · 섬 안 워터파크 포함",0],
- ["spa","4일차 스파 예약","공항 근처 샤워 가능한 곳 · A코스 18:30, B코스 19:15 · 4인",0],
+ ["spa","4일차 마사지 예약","11/30 18:30 · 90분 · 4인 · 샤워 가능한 곳 · 공항 샌딩 되면 좋아요",0],
  ["checkin","제주항공 좌석 지정·온라인 체크인","가족 좌석 붙여 앉기, 위탁수하물 허용량 확인",0],
  ["kids","아이 준비물","수영복·래시가드, 선크림, 모기 기피제, 상비약, 유모차",0],
  ["home","12/1(화) 귀가 교통·일정 확인","06:35 인천 도착 · 출근·등교 일정 조정",0],
@@ -1185,7 +1185,7 @@ meEl.addEventListener('change',()=>{ls('pq-me',me());const p=document.getElement
 const now=()=>new Date().toISOString();
 const uid=p=>p+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
 let editingTask=null,taskDirty=false,lastMoved=null;
-const HIDE_TASKS=new Set(['vw-buggy','tk-tinhhoa','tk-gondola','tk-teddy','day4-route','cable','spa','plan']);
+const HIDE_TASKS=new Set(['vw-buggy','tk-tinhhoa','tk-gondola','tk-teddy','day4-route','cable','plan']);
 function allTasks(){
   const out=[],seen={};HIDE_TASKS.forEach(id=>{const r=store.checks[id];if(!(r&&r.done))seen[id]=1;});
   DEFAULT_TASKS.forEach(([id,t,n,d],i)=>{seen[id]=1;const r=store.checks[id];if(r&&r.deleted)return;
