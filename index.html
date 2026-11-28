@@ -197,6 +197,15 @@ table.cost{width:100%;border-collapse:collapse;font-size:13px;min-width:460px}
 .bar b{font-family:var(--mono);font-variant-numeric:tabular-nums;font-weight:500;font-size:12px;white-space:nowrap}
 .bar span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .exlist{list-style:none;margin:0;padding:0;display:grid}
+button.bar{font:inherit;color:inherit;text-align:left;background:none;border:0;border-radius:8px;padding:4px 6px;margin:-4px -6px;cursor:pointer;width:calc(100% + 12px)}
+button.bar:hover{background:var(--chip)}
+button.bar.on{background:color-mix(in srgb,var(--sea) 14%,transparent);outline:1px solid var(--sea)}
+button.bar.dim{opacity:.45}
+.exfilter{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:13px;margin:0 0 6px}
+.exfilter b{color:var(--sea)}
+.exlist li.exedit{display:block;padding:6px 0 12px;border-bottom:1px dashed var(--line)}
+.exlist li.exedit>.card{margin:0;border:1.5px solid var(--sea);box-shadow:none}
+.exlist li.isedit{background:color-mix(in srgb,var(--sea) 8%,transparent);border-radius:8px}
 .exlist li{display:grid;grid-template-columns:1fr auto;gap:2px 10px;padding:9px 0;border-bottom:1px dashed var(--line);align-items:start}
 .exlist li:last-child{border-bottom:0}
 .exlist .t{font-size:14px;font-weight:500;min-width:0;overflow-wrap:anywhere}
@@ -503,6 +512,7 @@ details.card[open] summary{margin-bottom:6px}
 
     <div class="secthead"><h3>지출 기록</h3><button type="button" class="ghostbtn" id="exAddBtn">+ 지출 추가</button></div>
     <span class="formmsg" id="exNote"></span>
+    <span id="exHome" hidden></span>
     <div class="card" id="exCard" hidden>
       <h3 id="exTitle">지출 추가</h3>
       <form id="exForm" class="exform" novalidate>
@@ -542,6 +552,7 @@ details.card[open] summary{margin-bottom:6px}
 
     <div class="card">
       <h3>지출 내역 <span class="cnt" id="exCnt"></span></h3>
+      <div class="exfilter" id="exFilter" hidden></div>
       <ul class="exlist" id="exList"></ul>
     </div>
 
@@ -1317,10 +1328,19 @@ $('addTaskForm').addEventListener('submit',e=>{
 });
 
 /* expenses */
-function bars(el,map,colorOf){
+function bars(el,map,colorOf,kind){
   const rows=Object.entries(map).sort((a,b)=>b[1]-a[1]);const max=rows.length?rows[0][1]:0;
-  el.innerHTML=rows.length?rows.map(([k,v])=>`<div class="bar" style="--c:var(${colorOf(k)})"><span>${esc(k)}</span><div class="tr"><i style="width:${max?v/max*100:0}%"></i></div><b>${won(v)}</b></div>`).join(''):'<div class="empty">아직 기록이 없어요</div>';
+  el.innerHTML=rows.length?rows.map(([k,v])=>{const on=exFilter&&exFilter.kind===kind&&exFilter.val===k,dim=exFilter&&!on;
+    return `<button type="button" class="bar${on?' on':''}${dim?' dim':''}" data-fk="${kind}" data-fv="${esc(k)}" aria-pressed="${on}" style="--c:var(${colorOf(k)})" aria-label="${esc(k)} 지출만 보기"><span>${esc(k)}</span><div class="tr"><i style="width:${max?v/max*100:0}%"></i></div><b>${won(v)}</b></button>`;}).join(''):'<div class="empty">아직 기록이 없어요</div>';
 }
+/* tap a bar → show only those expenses (tap again or 전체 보기 to clear) */
+let exFilter=null;
+function setExFilter(kind,val){
+  exFilter=exFilter&&exFilter.kind===kind&&exFilter.val===val?null:{kind,val};
+  renderExpenses();
+  if(exFilter)$('exList').closest('.card').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});
+}
+['byCat','byPayer'].forEach(id=>$(id).addEventListener('click',e=>{const b=e.target.closest('[data-fk]');if(b)setExFilter(b.dataset.fk,b.dataset.fv);}));
 function renderExpenses(){
   const xs=store.expenses.slice().sort((a,b)=>(b.date+b.createdAt).localeCompare(a.date+a.createdAt));
   const total=xs.reduce((t,x)=>t+krw(x),0);
@@ -1330,17 +1350,24 @@ function renderExpenses(){
   document.getElementById('exCnt').textContent=xs.length+'건';
   const byCat={},byPayer={};
   xs.forEach(x=>{byCat[x.cat]=(byCat[x.cat]||0)+krw(x);const p=x.payer||'미지정';byPayer[p]=(byPayer[p]||0)+krw(x);});
-  bars(document.getElementById('byCat'),byCat,k=>CATC[k]||'--muted');
-  bars(document.getElementById('byPayer'),byPayer,()=> '--sea');
-  document.getElementById('exList').innerHTML=xs.length?xs.map(x=>`<li>
+  bars(document.getElementById('byCat'),byCat,k=>CATC[k]||'--muted','cat');
+  bars(document.getElementById('byPayer'),byPayer,()=> '--sea','payer');
+  const shown=exFilter?xs.filter(x=>exFilter.kind==='cat'?x.cat===exFilter.val:(x.payer||'미지정')===exFilter.val):xs;
+  const fl=$('exFilter');
+  if(exFilter){const sum=shown.reduce((t,x)=>t+krw(x),0);fl.hidden=false;fl.innerHTML=`<span><b>${esc(exFilter.val)}</b> ${shown.length}건 · ${won(sum)}원</span><button type="button" class="ghostbtn" data-fclear>전체 보기</button>`;}
+  else{fl.hidden=true;fl.innerHTML='';}
+  const exCard=$('exCard');if($('exList').contains(exCard))$('exHome').after(exCard);
+  document.getElementById('exList').innerHTML=shown.length?shown.map(x=>`<li data-eid="${esc(x.id)}"${x.id===editingId?' class="isedit"':''}>
     <div class="t"><span class="cat">${esc(x.cat)}</span>${esc(x.item)}</div>
     <div class="a">${won(krw(x))}원</div>
     <div class="m">${esc(x.date.slice(5).replace('-','/'))}${x.payer?' · '+esc(x.payer):''}${x.memo?' · '+esc(x.memo):''}${x.photos&&x.photos.length?` <button type="button" class="pchip" data-ph="${esc(x.id)}">사진 ${x.photos.length}</button>`:''}</div>
     <div>${x.cur!=='KRW'?`<div class="o">${Number(x.amount).toLocaleString('ko-KR')} ${x.cur}</div>`:''}<div class="rowbtns"><button class="edit" type="button" data-id="${esc(x.id)}">수정</button><button class="del" type="button" data-id="${esc(x.id)}">삭제</button></div></div>
   </li>`).join(''):'<li class="empty">아직 기록이 없어요. 위에서 첫 지출을 추가해 보세요.</li>';
+  if(editingId)placeEditor();
   const names=[...new Set([me(),...xs.map(x=>x.payer)].filter(Boolean))];
   document.getElementById('payers').innerHTML=names.map(n=>`<option value="${esc(n)}">`).join('');
 }
+$('exFilter').addEventListener('click',e=>{if(e.target.closest('[data-fclear]')){exFilter=null;renderExpenses();}});
 document.getElementById('exList').addEventListener('click',e=>{
   const ph=e.target.closest('[data-ph]');if(ph){const x=store.expenses.find(v=>v.id===ph.dataset.ph);if(x)openViewer(x.photos.map(p=>({id:p.id,t:p.t,label:x.item})),0);return;}
   const ed=e.target.closest('.edit');if(ed){startEdit(ed.dataset.id);return;}
@@ -1546,11 +1573,19 @@ const form=document.getElementById('exForm'),msg=document.getElementById('exMsg'
 document.getElementById('exDate').value=new Date().toLocaleDateString('sv-SE');
 document.getElementById('exPayer').value=me();
 let editingId=null;
-function exOpen(){$('exCard').hidden=false;$('exAddBtn').hidden=true;$('exNote').textContent='';}
-function exClose(){$('exCard').hidden=true;$('exAddBtn').hidden=false;}
-$('exAddBtn').addEventListener('click',()=>{resetForm();exOpen();msg.textContent='VND는 1,000동 ≈ 54원, USD는 1달러 ≈ 1,400원으로 환산해요';$('exItem').focus();});
+function exOpen(){$('exCard').hidden=false;$('exNote').textContent='';}
+function exClose(){$('exCard').hidden=true;$('exAddBtn').hidden=false;unplaceEditor();}
+/* editing opens right under that expense */
+function placeEditor(){
+  const li=document.querySelector(`#exList li[data-eid="${CSS.escape(editingId)}"]`);
+  if(!li){unplaceEditor();return false;}
+  let w=$('exEditLi');if(!w){w=document.createElement('li');w.id='exEditLi';w.className='exedit';}
+  li.after(w);w.append($('exCard'));return true;
+}
+function unplaceEditor(){const w=$('exEditLi');$('exHome').after($('exCard'));if(w)w.remove();document.querySelectorAll('#exList li.isedit').forEach(l=>l.classList.remove('isedit'));}
+$('exAddBtn').addEventListener('click',()=>{resetForm();exOpen();$('exAddBtn').hidden=true;msg.textContent='VND는 1,000동 ≈ 54원, USD는 1달러 ≈ 1,400원으로 환산해요';$('exItem').focus();});
 function resetForm(){
-  editingId=null;$('exCard').classList.remove('editing');$('exTitle').textContent='지출 추가';
+  editingId=null;$('exCard').classList.remove('editing');$('exTitle').textContent='지출 추가';unplaceEditor();
   $('exSubmit').textContent='추가';$('exCancel').textContent='닫기';$('exClear').hidden=false;
   ['exItem','exAmt','exMemo'].forEach(i=>$(i).value='');
   $('exDate').value=new Date().toLocaleDateString('sv-SE');$('exPayer').value=me();
@@ -1564,9 +1599,12 @@ function startEdit(id){
   $('exItem').value=x.item;$('exAmt').value=Number(x.amount).toLocaleString('ko-KR');$('exCur').value=x.cur;
   $('exCat').value=x.cat;$('exDate').value=x.date;$('exPayer').value=x.payer||'';$('exMemo').value=x.memo||'';
   exAtt.set(x.photos);
-  exOpen();msg.textContent='고친 뒤 저장을 눌러 주세요';
+  exOpen();msg.textContent='고친 뒤 저장을 눌러 주세요';$('exAddBtn').hidden=false;
   $('exThumb').hidden=true;$('exPhotoMsg').textContent='영수증 사진을 다시 올리면 이 지출 내용을 사진 기준으로 바꿔요';
-  $('exCard').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});
+  document.querySelectorAll('#exList li.isedit').forEach(l=>l.classList.remove('isedit'));
+  const row=document.querySelector(`#exList li[data-eid="${CSS.escape(id)}"]`);if(row)row.classList.add('isedit');
+  placeEditor();
+  $('exCard').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'nearest'});
 }
 $('exCancel').addEventListener('click',()=>{const wasEdit=!!editingId;resetForm();exClose();$('exNote').textContent=wasEdit?'수정을 취소했어요':'';});
 $('exClear').addEventListener('click',()=>{resetForm();$('exCat').selectedIndex=0;$('exCur').value='KRW';msg.textContent='입력한 내용을 지웠어요';$('exItem').focus();});
